@@ -1,0 +1,22 @@
+@model Janus.ViewModels.Admin.Applications.DeleteModel
+@{
+    ViewData["Title"] = "Delete Application";
+}
+
+<div class="page-header"><div class="container"><h1>Delete Application</h1><p>This hides the application while preserving historical data.</p></div></div>
+
+<section class="section-pad"><div class="container">
+@if (Model.Application != null)
+{
+    <div class="card-janus">
+        <h2>@Model.Application.Opportunity?.Title</h2>
+        <p>Student: @Model.Application.StudentUser?.DisplayName</p>
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ApplicationId" />
+            <button type="submit" class="btn-secondary-janus">Deactivate Application</button>
+            <a asp-area="Admin" asp-controller="Applications" asp-action="Index" class="btn-outline-teal">Cancel</a>
+        </form>
+    </div>
+}
+</div></section>

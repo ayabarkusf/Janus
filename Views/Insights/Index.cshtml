@@ -1,0 +1,49 @@
+@model Janus.ViewModels.Insights.IndexModel
+@{
+    ViewData["Title"] = "Insights";
+}
+
+<div class="page-header">
+    <div class="container">
+        <h1>Market Insights</h1>
+        <p>Prepared for future labor market API integration.</p>
+    </div>
+</div>
+
+<section class="section-pad">
+    <div class="container">
+        <div class="card-janus mb-4">
+            <h2 class="form-section-title">External API Placeholder</h2>
+            <p>
+                This page is reserved for external labor market data, such as BLS API data. For now,
+                it displays seeded database records so the page remains functional during development.
+            </p>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-janus">
+                <thead>
+                    <tr>
+                        <th>Industry</th>
+                        <th>Metric</th>
+                        <th>Value</th>
+                        <th>Source</th>
+                        <th>Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Insights)
+                    {
+                        <tr>
+                            <td>@item.Industry</td>
+                            <td>@item.MetricName</td>
+                            <td>@item.MetricValue</td>
+                            <td>@item.SourceName</td>
+                            <td>@item.LastUpdatedAt.ToShortDateString()</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

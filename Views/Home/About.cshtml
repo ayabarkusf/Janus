@@ -1,0 +1,48 @@
+@model Janus.ViewModels.AboutModel
+@{
+    ViewData["Title"] = "About";
+}
+
+<div class="page-header">
+    <div class="container">
+        <h1>About Janus</h1>
+        <p>Your career starts with a glimpse.</p>
+    </div>
+</div>
+
+<section class="section-pad">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-5">
+                <img src="~/images/janus-statue.jpg" alt="Janus statue" class="rounded shadow" />
+            </div>
+            <div class="col-lg-7">
+                <div class="card-janus">
+                    <h2 class="section-title">Mission</h2>
+                    <p>
+                        Janus connects high school students with working professionals for one-month shadow
+                        experiences. The goal is to help students explore real careers before choosing a college
+                        major or professional path.
+                    </p>
+                    <p>
+                        The application is built with ASP.NET Core MVC, Entity Framework Core, SQL Server LocalDB,
+                        ASP.NET Core Identity and a future-ready path for Azure SQL Database and Azure App Service.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad-sm">
+    <div class="container text-center">
+        <h2 class="section-title">Data Model</h2>
+        <p class="section-subtitle">A simplified model with one user table, opportunities and applications.</p>
+        <div class="card-janus">
+            <pre class="erd-text">AspNetUsers 1 --- * Opportunities
+AspNetUsers 1 --- * OpportunityApplications
+Opportunities 1 --- * OpportunityApplications
+MarketInsights stores future API market data.</pre>
+        </div>
+    </div>
+</section>

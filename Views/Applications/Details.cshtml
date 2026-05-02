@@ -1,0 +1,41 @@
+@model Janus.ViewModels.Applications.DetailsModel
+@{
+    ViewData["Title"] = "Application Details";
+}
+
+<div class="page-header"><div class="container"><h1>Application Details</h1><p>Review application information.</p></div></div>
+
+<section class="section-pad">
+    <div class="container">
+        @if (Model.Application != null)
+        {
+            <div class="card-janus">
+                <h2>@Model.Application.Opportunity?.Title</h2>
+                <p><strong>Student:</strong> @Model.Application.StudentUser?.DisplayName</p>
+                <p><strong>Host:</strong> @Model.Application.Opportunity?.HostUser?.DisplayName</p>
+                <p><strong>Status:</strong> @Model.Application.Status</p>
+                <p><strong>Cover note:</strong> @Model.Application.CoverNote</p>
+
+                @if (Model.CanEditStatus)
+                {
+                    <form method="post" class="mt-4">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="StatusInput.ApplicationId" />
+                        <div class="mb-3">
+                            <label asp-for="StatusInput.Status" class="form-label"></label>
+                            <select asp-for="StatusInput.Status" class="form-select">
+                                @foreach (var status in Model.Statuses)
+                                {
+                                    <option value="@status">@status</option>
+                                }
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary-janus">Update Status</button>
+                    </form>
+                }
+
+                <a asp-controller="Opportunities" asp-action="MyOpportunities" class="btn-outline-teal mt-4">Back</a>
+            </div>
+        }
+    </div>
+</section>

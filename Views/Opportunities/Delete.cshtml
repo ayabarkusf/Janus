@@ -1,0 +1,26 @@
+@model Janus.ViewModels.Opportunities.DeleteModel
+@{
+    ViewData["Title"] = "Remove Opportunity";
+}
+
+<div class="page-header"><div class="container"><h1>Remove Opportunity</h1><p>This will hide the opportunity but keep historical records.</p></div></div>
+
+<section class="section-pad">
+    <div class="container">
+        @if (Model.Opportunity != null)
+        {
+            <div class="card-janus">
+                <h2>@Model.Opportunity.Title</h2>
+                <p>@Model.Opportunity.Industry • @Model.Opportunity.City</p>
+                <p>Applications connected to this opportunity will remain in history.</p>
+
+                <form method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Opportunity.Id" />
+                    <button type="submit" class="btn-secondary-janus">Remove Opportunity</button>
+                    <a asp-controller="Opportunities" asp-action="MyOpportunities" class="btn-outline-teal">Cancel</a>
+                </form>
+            </div>
+        }
+    </div>
+</section>

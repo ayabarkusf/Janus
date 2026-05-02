@@ -1,0 +1,119 @@
+@model Janus.ViewModels.IndexModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+<section class="hero">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <p class="hero-eyebrow">For High School Students &amp; Professionals</p>
+                <h1 class="hero-headline">Discover Your Career<br />Before You Choose It</h1>
+                <p class="hero-sub">
+                    Janus matches high school students with professionals for 1-month shadow experiences across healthcare,
+                    technology, finance, law and education.
+                </p>
+                <div class="hero-btns">
+                    <a asp-controller="Opportunities" asp-action="Index" class="btn-primary-janus">Browse Opportunities</a>
+                    <a asp-area="" asp-controller="Account" asp-action="Register" class="btn-outline-teal">Create Account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Featured Opportunities</h2>
+            <p class="section-subtitle">Newest open opportunities from the Janus database</p>
+        </div>
+
+        <div class="row g-4">
+            @foreach (var item in Model.FeaturedOpportunities)
+            {
+                <div class="col-lg-4">
+                    <div class="card-janus h-100">
+                        <h3>@item.Title</h3>
+                        <p class="opp-host">@item.HostUser?.DisplayName</p>
+                        <p class="opp-company">@item.HostUser?.Company</p>
+                        <p>@item.City • @item.Industry</p>
+                        <div class="opp-skills">
+                            @foreach (var skill in item.SkillsTaught.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                            {
+                                <span class="opp-skill-tag">@skill.Trim()</span>
+                            }
+                        </div>
+                        <a asp-controller="Opportunities" asp-action="Details" asp-route-id="@item.Id" class="btn-outline-teal mt-3">View Opportunity</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="section-pad">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">How Janus Works</h2>
+            <p class="section-subtitle">Three steps from career curiosity to your first professional glimpse</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-4 col-md-6">
+                <div class="card-janus text-center h-100">
+                    <div class="step-number">1</div>
+                    <h3>Create Your Account</h3>
+                    <p>Start with one account, then enable student or host features from your profile.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="card-janus text-center h-100">
+                    <div class="step-number">2</div>
+                    <h3>Browse Opportunities</h3>
+                    <p>Explore real career shadow opportunities by industry, city and skills taught.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="card-janus text-center h-100">
+                    <div class="step-number">3</div>
+                    <h3>Apply or Host</h3>
+                    <p>Students apply for opportunities. Hosts create opportunities and review applications.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad student-host-section">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card-janus h-100">
+                    <h3 class="split-label">For Students</h3>
+                    <h2 class="split-headline">Find your direction before you commit</h2>
+                    <ul class="split-list">
+                        <li>Browse career shadow opportunities</li>
+                        <li>Apply with a short cover note</li>
+                        <li>Track your application status</li>
+                        <li>Always free for students</li>
+                    </ul>
+                    <a asp-controller="Users" asp-action="CreateStudentProfile" class="btn-primary-janus mt-4">Create Student Profile</a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-janus h-100">
+                    <h3 class="split-label split-label-purple">For Hosts</h3>
+                    <h2 class="split-headline">Give back and build your early talent pipeline</h2>
+                    <ul class="split-list">
+                        <li>Create shadow opportunities</li>
+                        <li>Review student applications</li>
+                        <li>Accept or decline applications</li>
+                        <li>Manage your listings from one dashboard</li>
+                    </ul>
+                    <a asp-controller="Users" asp-action="CreateHostProfile" class="btn-secondary-janus mt-4">Create Host Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

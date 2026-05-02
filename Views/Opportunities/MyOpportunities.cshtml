@@ -1,0 +1,56 @@
+@model Janus.ViewModels.Opportunities.MyOpportunitiesModel
+@{
+    ViewData["Title"] = "My Opportunities";
+}
+
+<div class="page-header"><div class="container"><h1>My Opportunities</h1><p>Manage opportunities and received applications.</p></div></div>
+
+<section class="section-pad">
+    <div class="container">
+        <a asp-controller="Opportunities" asp-action="Create" class="btn-primary-janus mb-4">Create Opportunity</a>
+
+        @foreach (var item in Model.Opportunities)
+        {
+            <div class="card-janus mb-4">
+                <div class="d-flex justify-content-between flex-wrap gap-2">
+                    <div>
+                        <h3>@item.Title</h3>
+                        <p>@item.Industry • @item.City • @(item.IsOpen ? "Open" : "Closed")</p>
+                        <p>@item.Applications.Count application(s)</p>
+                    </div>
+                    <div class="d-flex align-items-start gap-2">
+                        <a asp-controller="Opportunities" asp-action="Edit" asp-route-id="@item.Id" class="btn-outline-teal">Edit</a>
+                        <a asp-controller="Opportunities" asp-action="Delete" asp-route-id="@item.Id" class="btn-secondary-janus">Remove</a>
+                    </div>
+                </div>
+
+                @if (item.Applications.Any())
+                {
+                    <div class="table-responsive mt-3">
+                        <table class="table table-janus">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Status</th>
+                                    <th>Applied</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var app in item.Applications.OrderByDescending(a => a.AppliedAt))
+                                {
+                                    <tr>
+                                        <td>@app.StudentUser?.DisplayName</td>
+                                        <td>@app.Status</td>
+                                        <td>@app.AppliedAt.ToShortDateString()</td>
+                                        <td><a asp-controller="Applications" asp-action="Details" asp-route-id="@app.Id" class="btn-outline-teal btn-sm">Details</a></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>

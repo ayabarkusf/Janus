@@ -1,0 +1,30 @@
+@model Janus.ViewModels.Hosts.IndexModel
+@{
+    ViewData["Title"] = "Hosts";
+}
+
+<div class="page-header">
+    <div class="container">
+        <h1>Host Directory</h1>
+        <p>Meet the professionals offering Janus shadow opportunities.</p>
+    </div>
+</div>
+
+<section class="section-pad">
+    <div class="container">
+        <div class="row g-4">
+            @foreach (var host in Model.Hosts)
+            {
+                <div class="col-lg-4">
+                    <div class="card-janus h-100">
+                        <h3>@host.DisplayName</h3>
+                        <p class="opp-company">@host.Company</p>
+                        <p>@host.City • @host.Industry</p>
+                        <p>@host.Bio</p>
+                        <a asp-controller="Hosts" asp-action="Details" asp-route-id="@host.Id" class="btn-outline-teal">View Host</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>

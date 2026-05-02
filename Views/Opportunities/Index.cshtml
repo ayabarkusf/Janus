@@ -1,0 +1,76 @@
+@model Janus.ViewModels.Opportunities.IndexModel
+@{
+    ViewData["Title"] = "Opportunities";
+}
+
+<div class="page-header">
+    <div class="container">
+        <h1>Browse Opportunities</h1>
+        <p>Explore real career shadow opportunities by industry, city and skills taught.</p>
+    </div>
+</div>
+
+<section class="section-pad">
+    <div class="container">
+        <div class="card-janus mb-4">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label asp-for="Industry" class="form-label"></label>
+                    <select asp-for="Industry" class="form-select">
+                        <option value="">All industries</option>
+                        @foreach (var industry in Model.Industries)
+                        {
+                            <option value="@industry">@industry</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="City" class="form-label"></label>
+                    <input asp-for="City" class="form-control" placeholder="City" />
+                </div>
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn-primary-janus">Filter</button>
+                    <a asp-controller="Opportunities" asp-action="Index" class="btn-outline-teal">Clear</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-janus">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Host</th>
+                        <th>Company</th>
+                        <th>Industry</th>
+                        <th>City</th>
+                        <th>Skills</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Opportunities)
+                    {
+                        <tr>
+                            <td>@item.Title</td>
+                            <td>@item.HostUser?.DisplayName</td>
+                            <td>@item.HostUser?.Company</td>
+                            <td>@item.Industry</td>
+                            <td>@item.City</td>
+                            <td>@item.SkillsTaught</td>
+                            <td class="text-nowrap">
+                                <a asp-controller="Opportunities" asp-action="Details" asp-route-id="@item.Id" class="btn-outline-teal btn-sm">Details</a>
+                                <a asp-controller="Applications" asp-action="Apply" asp-route-opportunityId="@item.Id" class="btn-primary-janus btn-sm">Apply</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a asp-controller="Opportunities" asp-action="Create" class="btn-secondary-janus mt-4">Create Opportunity</a>
+        }
+    </div>
+</section>

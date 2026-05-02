@@ -1,0 +1,39 @@
+@model Janus.ViewModels.Applications.MyApplicationsModel
+@{
+    ViewData["Title"] = "My Applications";
+}
+
+<div class="page-header"><div class="container"><h1>My Applications</h1><p>Track your submitted applications.</p></div></div>
+
+<section class="section-pad">
+    <div class="container">
+        <div class="table-responsive">
+            <table class="table table-janus">
+                <thead>
+                    <tr>
+                        <th>Opportunity</th>
+                        <th>Host</th>
+                        <th>Industry</th>
+                        <th>Status</th>
+                        <th>Applied</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Applications)
+                    {
+                        <tr>
+                            <td>@item.Opportunity?.Title</td>
+                            <td>@item.Opportunity?.HostUser?.DisplayName</td>
+                            <td>@item.Opportunity?.Industry</td>
+                            <td>@item.Status</td>
+                            <td>@item.AppliedAt.ToShortDateString()</td>
+                            <td><a asp-controller="Applications" asp-action="Details" asp-route-id="@item.Id" class="btn-outline-teal btn-sm">Details</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <a asp-controller="Opportunities" asp-action="Index" class="btn-primary-janus mt-4">Browse Opportunities</a>
+    </div>
+</section>

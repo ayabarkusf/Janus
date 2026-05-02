@@ -1,0 +1,58 @@
+@model Janus.ViewModels.Users.CreateStudentProfileModel
+@{
+    ViewData["Title"] = "Create Student Profile";
+}
+
+<div class="page-header"><div class="container"><h1>Create Student Profile</h1><p>Enable student features for your account.</p></div></div>
+
+<section class="section-pad">
+    <div class="container">
+        <div class="card-janus">
+            @if (Model.AlreadyStudent)
+            {
+                <p>Your student profile is already active.</p>
+                <a asp-controller="Users" asp-action="MyProfile" class="btn-primary-janus">Back to Profile</a>
+            }
+            else
+            {
+                <form method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div class="mb-3">
+                        <label asp-for="Input.City" class="form-label"></label>
+                        <input asp-for="Input.City" class="form-control" />
+                        <span asp-validation-for="Input.City" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.GradeLevel" class="form-label"></label>
+                        <select asp-for="Input.GradeLevel" class="form-select">
+                            <option value="">Select grade</option>
+                            @foreach (var grade in Model.GradeLevels)
+                            {
+                                <option value="@grade">@grade</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Input.GradeLevel" class="text-danger"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="Input.CareerInterest" class="form-label"></label>
+                        <select asp-for="Input.CareerInterest" class="form-select">
+                            <option value="">Select interest</option>
+                            @foreach (var industry in Model.Industries)
+                            {
+                                <option value="@industry">@industry</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Input.CareerInterest" class="text-danger"></span>
+                    </div>
+                    <button type="submit" class="btn-primary-janus">Enable Student Profile</button>
+                    <a asp-controller="Users" asp-action="MyProfile" class="btn-outline-teal">Cancel</a>
+                </form>
+            }
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

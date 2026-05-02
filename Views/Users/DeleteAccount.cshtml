@@ -1,0 +1,28 @@
+@model Janus.ViewModels.Users.DeleteAccountModel
+@{
+    ViewData["Title"] = "Delete Account";
+}
+
+<div class="page-header"><div class="container"><h1>Delete Account</h1><p>Your account will be removed from access, but historical data will be preserved.</p></div></div>
+
+<section class="section-pad">
+    <div class="container">
+        <div class="card-janus">
+            <h2>Confirm Account Deletion</h2>
+            <p>
+                This will deactivate your account. You will no longer be able to log in and the system
+                will behave as if the account does not exist.
+            </p>
+            <p>
+                Existing historical records, such as applications and opportunities, will remain in the database
+                for reporting and integrity.
+            </p>
+
+            <form method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-secondary-janus">Delete My Account</button>
+                <a asp-controller="Users" asp-action="MyProfile" class="btn-outline-teal">Cancel</a>
+            </form>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,23 @@
+@model Janus.ViewModels.Admin.Users.DetailsModel
+@{
+    ViewData["Title"] = "User Details";
+}
+
+<div class="page-header"><div class="container"><h1>User Details</h1><p>@Model.ManagedUser?.Email</p></div></div>
+
+<section class="section-pad"><div class="container">
+@if (Model.ManagedUser != null)
+{
+    <div class="card-janus">
+        <h2>@Model.ManagedUser.DisplayName</h2>
+        <p><strong>Email:</strong> @Model.ManagedUser.Email</p>
+        <p><strong>City:</strong> @Model.ManagedUser.City</p>
+        <p><strong>Student Role:</strong> @Model.ManagedUser.IsStudent</p>
+        <p><strong>Host Role:</strong> @Model.ManagedUser.IsHost</p>
+        <p><strong>Admin Role:</strong> @Model.ManagedUser.IsAdmin</p>
+        <p><strong>Active:</strong> @Model.ManagedUser.IsActive</p>
+        <a asp-area="Admin" asp-controller="Users" asp-action="Edit" asp-route-id="@Model.ManagedUser.Id" class="btn-primary-janus">Edit</a>
+        <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="btn-outline-teal">Back</a>
+    </div>
+}
+</div></section>

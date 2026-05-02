@@ -1,0 +1,34 @@
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    var currentUser = await UserManager.GetUserAsync(User);
+    if (currentUser != null)
+    {
+        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Users" asp-action="MyProfile">My Profile</a></li>
+        @if (User.IsInRole(AppConstants.StudentRole))
+        {
+            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Applications" asp-action="MyApplications">My Applications</a></li>
+        }
+        @if (User.IsInRole(AppConstants.HostRole))
+        {
+            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Opportunities" asp-action="MyOpportunities">My Opportunities</a></li>
+        }
+        @if (User.IsInRole(AppConstants.AdminRole))
+        {
+            <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Admin" asp-action="Index">Admin</a></li>
+        }
+        <li class="nav-item">
+            <form method="post" asp-area="" asp-controller="Account" asp-action="Logout" class="d-inline">
+                <button type="submit" class="nav-link btn btn-link p-0 ps-lg-2">Logout</button>
+            </form>
+        </li>
+    }
+}
+else
+{
+    <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Login</a></li>
+    <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Account" asp-action="Register">Register</a></li>
+}

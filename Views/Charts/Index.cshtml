@@ -1,0 +1,83 @@
+@model Janus.ViewModels.Charts.IndexModel
+@{
+    ViewData["Title"] = "Charts";
+}
+
+<div class="page-header">
+    <div class="container">
+        <h1>System Charts</h1>
+        <p>These charts use live database data from opportunities and applications.</p>
+    </div>
+</div>
+
+<section class="section-pad">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card-janus h-100">
+                    <h2 class="form-section-title">Opportunities by Industry</h2>
+                    <div class="chart-box"><canvas id="chartIndustry"></canvas></div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-janus h-100">
+                    <h2 class="form-section-title">Applications by Status</h2>
+                    <div class="chart-box"><canvas id="chartStatus"></canvas></div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-janus h-100">
+                    <h2 class="form-section-title">Applications Over Time</h2>
+                    <div class="chart-box"><canvas id="chartApplications"></canvas></div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-janus h-100">
+                    <h2 class="form-section-title">Opportunities by City</h2>
+                    <div class="chart-box"><canvas id="chartCity"></canvas></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const industryLabels = @Html.Raw(Model.IndustryLabelsJson);
+        const industryCounts = @Html.Raw(Model.IndustryCountsJson);
+        const statusLabels = @Html.Raw(Model.StatusLabelsJson);
+        const statusCounts = @Html.Raw(Model.StatusCountsJson);
+        const monthLabels = @Html.Raw(Model.MonthLabelsJson);
+        const monthCounts = @Html.Raw(Model.MonthCountsJson);
+        const cityLabels = @Html.Raw(Model.CityLabelsJson);
+        const cityCounts = @Html.Raw(Model.CityCountsJson);
+
+        Chart.defaults.color = '#E8F4F8';
+        Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+
+        new Chart(document.getElementById('chartIndustry'), {
+            type: 'doughnut',
+            data: { labels: industryLabels, datasets: [{ data: industryCounts }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        new Chart(document.getElementById('chartStatus'), {
+            type: 'doughnut',
+            data: { labels: statusLabels, datasets: [{ data: statusCounts }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        new Chart(document.getElementById('chartApplications'), {
+            type: 'line',
+            data: { labels: monthLabels, datasets: [{ label: 'Applications', data: monthCounts, tension: 0.35, fill: true }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        });
+
+        new Chart(document.getElementById('chartCity'), {
+            type: 'bar',
+            data: { labels: cityLabels, datasets: [{ label: 'Opportunities', data: cityCounts }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        });
+    </script>
+}

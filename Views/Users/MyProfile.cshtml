@@ -1,0 +1,69 @@
+@model Janus.ViewModels.Users.MyProfileModel
+@{
+    ViewData["Title"] = "My Profile";
+    var isStudent = User.IsInRole(AppConstants.StudentRole);
+    var isHost = User.IsInRole(AppConstants.HostRole);
+    var isAdmin = User.IsInRole(AppConstants.AdminRole);
+}
+
+<div class="page-header"><div class="container"><h1>My Profile</h1><p>Manage your Janus account and profile access.</p></div></div>
+
+<section class="section-pad">
+    <div class="container">
+        @if (Model.CurrentUser != null)
+        {
+            <div class="card-janus">
+                <h2>@Model.CurrentUser.DisplayName</h2>
+                <p><strong>Email:</strong> @Model.CurrentUser.Email</p>
+                <p><strong>City:</strong> @Model.CurrentUser.City</p>
+
+                <div class="row g-3 my-4">
+                    <div class="col-md-4"><div class="profile-badge">Student: @(isStudent ? "Yes" : "No")</div></div>
+                    <div class="col-md-4"><div class="profile-badge">Host: @(isHost ? "Yes" : "No")</div></div>
+                    @if (isAdmin)
+                    {
+                        <div class="col-md-4"><div class="profile-badge">Admin: Yes</div></div>
+                    }
+                </div>
+
+                @if (isStudent)
+                {
+                    <p><strong>Grade:</strong> @Model.CurrentUser.GradeLevel</p>
+                    <p><strong>Career Interest:</strong> @Model.CurrentUser.CareerInterest</p>
+                }
+
+                @if (isHost)
+                {
+                    <p><strong>Company:</strong> @Model.CurrentUser.Company</p>
+                    <p><strong>Industry:</strong> @Model.CurrentUser.Industry</p>
+                    <p><strong>Bio:</strong> @Model.CurrentUser.Bio</p>
+                }
+
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a asp-controller="Users" asp-action="EditProfile" class="btn-primary-janus">Edit Profile</a>
+                    @if (!isStudent)
+                    {
+                        <a asp-controller="Users" asp-action="CreateStudentProfile" class="btn-outline-teal">Create Student Profile</a>
+                    }
+                    @if (!isHost)
+                    {
+                        <a asp-controller="Users" asp-action="CreateHostProfile" class="btn-secondary-janus">Create Host Profile</a>
+                    }
+                    @if (isStudent)
+                    {
+                        <a asp-controller="Applications" asp-action="MyApplications" class="btn-outline-teal">My Applications</a>
+                    }
+                    @if (isHost)
+                    {
+                        <a asp-controller="Opportunities" asp-action="MyOpportunities" class="btn-outline-teal">My Opportunities</a>
+                    }
+                    @if (isAdmin)
+                    {
+                        <a asp-area="Admin" asp-controller="Admin" asp-action="Index" class="btn-secondary-janus">Admin Dashboard</a>
+                    }
+                    <a asp-controller="Users" asp-action="DeleteAccount" class="btn-outline-teal">Delete Account</a>
+                </div>
+            </div>
+        }
+    </div>
+</section>

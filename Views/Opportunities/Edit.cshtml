@@ -1,0 +1,67 @@
+@model Janus.ViewModels.Opportunities.EditModel
+@{
+    ViewData["Title"] = "Edit Opportunity";
+}
+
+<div class="page-header"><div class="container"><h1>Edit Opportunity</h1><p>Update opportunity details.</p></div></div>
+
+<section class="section-pad">
+    <div class="container">
+        <div class="card-janus">
+            <form method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Opportunity.Id" />
+                <input type="hidden" asp-for="Opportunity.HostUserId" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Opportunity.Title" class="form-label"></label>
+                    <input asp-for="Opportunity.Title" class="form-control" />
+                    <span asp-validation-for="Opportunity.Title" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Opportunity.Industry" class="form-label"></label>
+                        <select asp-for="Opportunity.Industry" class="form-select">
+                            @foreach (var industry in Model.Industries)
+                            {
+                                <option value="@industry">@industry</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Opportunity.Industry" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Opportunity.City" class="form-label"></label>
+                        <input asp-for="Opportunity.City" class="form-control" />
+                        <span asp-validation-for="Opportunity.City" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Opportunity.SkillsTaught" class="form-label"></label>
+                    <input asp-for="Opportunity.SkillsTaught" class="form-control" />
+                    <span asp-validation-for="Opportunity.SkillsTaught" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Opportunity.Description" class="form-label"></label>
+                    <textarea asp-for="Opportunity.Description" class="form-control" rows="5"></textarea>
+                    <span asp-validation-for="Opportunity.Description" class="text-danger"></span>
+                </div>
+
+                <div class="form-check mb-4">
+                    <input asp-for="Opportunity.IsOpen" class="form-check-input" />
+                    <label asp-for="Opportunity.IsOpen" class="form-check-label"></label>
+                </div>
+
+                <button type="submit" class="btn-primary-janus">Save</button>
+                <a asp-controller="Opportunities" asp-action="MyOpportunities" class="btn-outline-teal">Cancel</a>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

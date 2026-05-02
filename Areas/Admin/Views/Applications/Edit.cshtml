@@ -1,0 +1,42 @@
+@model Janus.ViewModels.Admin.Applications.EditModel
+@{
+    ViewData["Title"] = "Edit Application";
+}
+
+<div class="page-header"><div class="container"><h1>Edit Application</h1><p>Admin status and active-state update.</p></div></div>
+
+<section class="section-pad"><div class="container"><div class="card-janus">
+<form method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Input.Id" />
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <p><strong>Student:</strong> @Model.StudentName</p>
+    <p><strong>Opportunity:</strong> @Model.OpportunityTitle</p>
+
+    <div class="mb-3">
+        <label asp-for="Input.Status" class="form-label"></label>
+        <select asp-for="Input.Status" class="form-select">
+            @foreach (var status in Model.Statuses)
+            {
+                <option value="@status">@status</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.CoverNote" class="form-label"></label>
+        <textarea asp-for="Input.CoverNote" class="form-control" rows="4"></textarea>
+    </div>
+
+    <div class="form-check mb-4">
+        <input asp-for="Input.IsActive" class="form-check-input" />
+        <label asp-for="Input.IsActive" class="form-check-label"></label>
+    </div>
+
+    <button type="submit" class="btn-primary-janus">Save</button>
+    <a asp-area="Admin" asp-controller="Applications" asp-action="Index" class="btn-outline-teal">Cancel</a>
+</form>
+</div></div></section>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

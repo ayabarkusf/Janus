@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Janus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">JANUS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav mx-auto gap-1">
+                    <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Opportunities" asp-action="Index">Opportunities</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Hosts" asp-action="Index">Hosts</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Charts" asp-action="Index">Charts</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Insights" asp-action="Index">Insights</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="About">About</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Bot">Ask Janus AI</a></li>
+                    <partial name="_LoginPartial" />
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <partial name="_StatusMessage" />
+    @RenderBody()
+
+    <footer>
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <span class="footer-logo">JANUS</span>
+                    <p class="footer-tagline">"Your career starts with a glimpse."</p>
+                </div>
+                <div class="col-lg-4">
+                    <div class="footer-links">
+                        <a asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        <a asp-area="" asp-controller="Opportunities" asp-action="Index">Opportunities</a>
+                        <a asp-area="" asp-controller="Charts" asp-action="Index">Charts</a>
+                        <a asp-area="" asp-controller="Insights" asp-action="Index">Insights</a>
+                        <a asp-area="" asp-controller="Home" asp-action="Bot">Ask Janus AI</a>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="footer-links">
+                        <a asp-area="" asp-controller="Users" asp-action="MyProfile">My Profile</a>
+                        <a asp-area="" asp-controller="Users" asp-action="CreateStudentProfile">Create Student Profile</a>
+                        <a asp-area="" asp-controller="Users" asp-action="CreateHostProfile">Create Host Profile</a>
+                        <a asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+                    </div>
+                </div>
+            </div>
+            <p class="footer-copyright">
+                &copy; 2026 Janus — ISM 6225 Application Development for Analytics | University of South Florida
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <partial name="_BotpressScript" />
+</body>
+</html>

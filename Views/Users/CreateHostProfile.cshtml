@@ -1,0 +1,59 @@
+@model Janus.ViewModels.Users.CreateHostProfileModel
+@{
+    ViewData["Title"] = "Create Host Profile";
+}
+
+<div class="page-header"><div class="container"><h1>Create Host Profile</h1><p>Enable host features for your account.</p></div></div>
+
+<section class="section-pad">
+    <div class="container">
+        <div class="card-janus">
+            @if (Model.AlreadyHost)
+            {
+                <p>Your host profile is already active.</p>
+                <a asp-controller="Users" asp-action="MyProfile" class="btn-primary-janus">Back to Profile</a>
+            }
+            else
+            {
+                <form method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.City" class="form-label"></label>
+                        <input asp-for="Input.City" class="form-control" />
+                        <span asp-validation-for="Input.City" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Company" class="form-label"></label>
+                        <input asp-for="Input.Company" class="form-control" />
+                        <span asp-validation-for="Input.Company" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Industry" class="form-label"></label>
+                        <select asp-for="Input.Industry" class="form-select">
+                            <option value="">Select industry</option>
+                            @foreach (var industry in Model.Industries)
+                            {
+                                <option value="@industry">@industry</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Input.Industry" class="text-danger"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="Input.Bio" class="form-label"></label>
+                        <textarea asp-for="Input.Bio" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Input.Bio" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn-primary-janus">Enable Host Profile</button>
+                    <a asp-controller="Users" asp-action="MyProfile" class="btn-outline-teal">Cancel</a>
+                </form>
+            }
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

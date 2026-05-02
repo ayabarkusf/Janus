@@ -1,0 +1,33 @@
+@model Janus.ViewModels.Admin.Applications.IndexModel
+@{
+    ViewData["Title"] = "Admin Applications";
+}
+
+<div class="page-header"><div class="container"><h1>Manage Applications</h1><p>Admin CRUD for applications.</p></div></div>
+
+<section class="section-pad">
+<div class="container">
+<div class="table-responsive">
+<table class="table table-janus">
+<thead><tr><th>Student</th><th>Opportunity</th><th>Status</th><th>Active</th><th>Applied</th><th></th></tr></thead>
+<tbody>
+@foreach (var item in Model.Applications)
+{
+    <tr>
+        <td>@item.StudentUser?.DisplayName</td>
+        <td>@item.Opportunity?.Title</td>
+        <td>@item.Status</td>
+        <td>@item.IsActive</td>
+        <td>@item.AppliedAt.ToShortDateString()</td>
+        <td class="text-nowrap">
+            <a asp-area="Admin" asp-controller="Applications" asp-action="Details" asp-route-id="@item.Id" class="btn-outline-teal btn-sm">Details</a>
+            <a asp-area="Admin" asp-controller="Applications" asp-action="Edit" asp-route-id="@item.Id" class="btn-outline-teal btn-sm">Edit</a>
+            <a asp-area="Admin" asp-controller="Applications" asp-action="Delete" asp-route-id="@item.Id" class="btn-secondary-janus btn-sm">Delete</a>
+        </td>
+    </tr>
+}
+</tbody>
+</table>
+</div>
+</div>
+</section>

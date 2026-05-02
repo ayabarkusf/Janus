@@ -1,0 +1,20 @@
+@model Janus.ViewModels.Admin.Applications.DetailsModel
+@{
+    ViewData["Title"] = "Application Details";
+}
+
+<div class="page-header"><div class="container"><h1>Application Details</h1><p>Admin view.</p></div></div>
+<section class="section-pad"><div class="container">
+@if (Model.Application != null)
+{
+    <div class="card-janus">
+        <h2>@Model.Application.Opportunity?.Title</h2>
+        <p><strong>Student:</strong> @Model.Application.StudentUser?.DisplayName</p>
+        <p><strong>Status:</strong> @Model.Application.Status</p>
+        <p><strong>Active:</strong> @Model.Application.IsActive</p>
+        <p><strong>Cover note:</strong> @Model.Application.CoverNote</p>
+        <a asp-area="Admin" asp-controller="Applications" asp-action="Edit" asp-route-id="@Model.Application.Id" class="btn-primary-janus">Edit</a>
+        <a asp-area="Admin" asp-controller="Applications" asp-action="Index" class="btn-outline-teal">Back</a>
+    </div>
+}
+</div></section>

@@ -1,0 +1,38 @@
+@model Janus.ViewModels.Hosts.DetailsModel
+@{
+    ViewData["Title"] = "Host Details";
+}
+
+<div class="page-header">
+    <div class="container">
+        <h1>@Model.HostUser?.DisplayName</h1>
+        <p>@Model.HostUser?.Company • @Model.HostUser?.Industry</p>
+    </div>
+</div>
+
+<section class="section-pad">
+    <div class="container">
+        @if (Model.HostUser != null)
+        {
+            <div class="card-janus mb-4">
+                <h2 class="section-title">Host Profile</h2>
+                <p>@Model.HostUser.Bio</p>
+                <p><strong>City:</strong> @Model.HostUser.City</p>
+            </div>
+
+            <h2 class="section-title mb-4">Open Opportunities</h2>
+            <div class="row g-4">
+                @foreach (var opportunity in Model.Opportunities)
+                {
+                    <div class="col-lg-4">
+                        <div class="card-janus h-100">
+                            <h3>@opportunity.Title</h3>
+                            <p>@opportunity.City • @opportunity.Industry</p>
+                            <a asp-controller="Opportunities" asp-action="Details" asp-route-id="@opportunity.Id" class="btn-outline-teal">View Opportunity</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>

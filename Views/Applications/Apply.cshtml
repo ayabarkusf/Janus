@@ -1,0 +1,51 @@
+@model Janus.ViewModels.Applications.ApplyModel
+@{
+    ViewData["Title"] = "Apply";
+}
+
+<div class="page-header">
+    <div class="container">
+        <h1>Apply</h1>
+        <p>Submit a short application for this opportunity.</p>
+    </div>
+</div>
+
+<section class="section-pad">
+    <div class="container">
+        @if (Model.NeedsStudentProfile)
+        {
+            <div class="card-janus">
+                <h2>Create Student Profile First</h2>
+                <p>You need to enable student features before applying to opportunities.</p>
+                <a asp-controller="Users" asp-action="CreateStudentProfile" class="btn-primary-janus">Create Student Profile</a>
+            </div>
+        }
+        else if (Model.Opportunity != null)
+        {
+            <div class="card-janus">
+                <h2>@Model.Opportunity.Title</h2>
+                <p>@Model.Opportunity.HostUser?.DisplayName • @Model.Opportunity.HostUser?.Company</p>
+                <p>@Model.Opportunity.Industry • @Model.Opportunity.City</p>
+
+                <form method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Input.OpportunityId" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.CoverNote" class="form-label"></label>
+                        <textarea asp-for="Input.CoverNote" class="form-control" rows="5"></textarea>
+                        <span asp-validation-for="Input.CoverNote" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn-primary-janus">Submit Application</button>
+                    <a asp-controller="Opportunities" asp-action="Details" asp-route-id="@Model.Opportunity.Id" class="btn-outline-teal">Cancel</a>
+                </form>
+            </div>
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

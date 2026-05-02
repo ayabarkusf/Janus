@@ -1,0 +1,24 @@
+@model Janus.ViewModels.Applications.ThankYouModel
+@{
+    ViewData["Title"] = "Thank You";
+}
+
+<div class="page-header">
+    <div class="container">
+        <h1>Thank You</h1>
+        <p>Your application was submitted successfully.</p>
+    </div>
+</div>
+
+<section class="section-pad">
+    <div class="container">
+        <div class="card-janus text-center">
+            <h2>Thank you for your application to @Model.OpportunityTitle.</h2>
+            <p>The host will be able to review your application.</p>
+            <div class="d-flex justify-content-center flex-wrap gap-2 mt-4">
+                <a asp-controller="Applications" asp-action="MyApplications" class="btn-primary-janus">View My Applications</a>
+                <a asp-controller="Opportunities" asp-action="Index" class="btn-outline-teal">Browse More Opportunities</a>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,21 @@
+@model Janus.ViewModels.Admin.Opportunities.DeleteModel
+@{
+    ViewData["Title"] = "Delete Opportunity";
+}
+
+<div class="page-header"><div class="container"><h1>Delete Opportunity</h1><p>This will deactivate the opportunity only.</p></div></div>
+<section class="section-pad"><div class="container">
+@if (Model.Opportunity != null)
+{
+    <div class="card-janus">
+        <h2>@Model.Opportunity.Title</h2>
+        <p>Historical applications will be preserved.</p>
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="OpportunityId" />
+            <button type="submit" class="btn-secondary-janus">Deactivate Opportunity</button>
+            <a asp-area="Admin" asp-controller="Opportunities" asp-action="Index" class="btn-outline-teal">Cancel</a>
+        </form>
+    </div>
+}
+</div></section>

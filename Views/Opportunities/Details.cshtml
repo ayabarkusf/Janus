@@ -1,0 +1,32 @@
+@model Janus.ViewModels.Opportunities.DetailsModel
+@{
+    ViewData["Title"] = "Opportunity Details";
+}
+
+<div class="page-header">
+    <div class="container">
+        <h1>@Model.Opportunity?.Title</h1>
+        <p>@Model.Opportunity?.Industry • @Model.Opportunity?.City</p>
+    </div>
+</div>
+
+<section class="section-pad">
+    <div class="container">
+        @if (Model.Opportunity != null)
+        {
+            <div class="card-janus">
+                <h2 class="section-title">Opportunity Details</h2>
+                <p><strong>Host:</strong> @Model.Opportunity.HostUser?.DisplayName</p>
+                <p><strong>Company:</strong> @Model.Opportunity.HostUser?.Company</p>
+                <p><strong>Skills taught:</strong> @Model.Opportunity.SkillsTaught</p>
+                <p><strong>Status:</strong> @(Model.Opportunity.IsOpen ? "Open" : "Closed")</p>
+                <p>@Model.Opportunity.Description</p>
+
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a asp-controller="Applications" asp-action="Apply" asp-route-opportunityId="@Model.Opportunity.Id" class="btn-primary-janus">Apply</a>
+                    <a asp-controller="Opportunities" asp-action="Index" class="btn-outline-teal">Back to Opportunities</a>
+                </div>
+            </div>
+        }
+    </div>
+</section>

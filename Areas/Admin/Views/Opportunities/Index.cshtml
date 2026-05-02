@@ -1,0 +1,35 @@
+@model Janus.ViewModels.Admin.Opportunities.IndexModel
+@{
+    ViewData["Title"] = "Admin Opportunities";
+}
+
+<div class="page-header"><div class="container"><h1>Manage Opportunities</h1><p>Admin CRUD for all opportunities.</p></div></div>
+
+<section class="section-pad">
+<div class="container">
+<a asp-area="Admin" asp-controller="Opportunities" asp-action="Create" class="btn-primary-janus mb-4">Create Opportunity</a>
+<div class="table-responsive">
+<table class="table table-janus">
+<thead><tr><th>Title</th><th>Host</th><th>Industry</th><th>City</th><th>Open</th><th>Active</th><th></th></tr></thead>
+<tbody>
+@foreach (var item in Model.Opportunities)
+{
+    <tr>
+        <td>@item.Title</td>
+        <td>@item.HostUser?.DisplayName</td>
+        <td>@item.Industry</td>
+        <td>@item.City</td>
+        <td>@item.IsOpen</td>
+        <td>@item.IsActive</td>
+        <td class="text-nowrap">
+            <a asp-area="Admin" asp-controller="Opportunities" asp-action="Details" asp-route-id="@item.Id" class="btn-outline-teal btn-sm">Details</a>
+            <a asp-area="Admin" asp-controller="Opportunities" asp-action="Edit" asp-route-id="@item.Id" class="btn-outline-teal btn-sm">Edit</a>
+            <a asp-area="Admin" asp-controller="Opportunities" asp-action="Delete" asp-route-id="@item.Id" class="btn-secondary-janus btn-sm">Delete</a>
+        </td>
+    </tr>
+}
+</tbody>
+</table>
+</div>
+</div>
+</section>
