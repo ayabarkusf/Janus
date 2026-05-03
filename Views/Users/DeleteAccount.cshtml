@@ -3,20 +3,13 @@
     ViewData["Title"] = "Delete Account";
 }
 
-<div class="page-header"><div class="container"><h1>Delete Account</h1><p>Your account will be removed from access, but historical data will be preserved.</p></div></div>
+<div class="page-header"><div class="container"><h1>Delete Account</h1><p>This action cannot be undone.</p></div></div>
 
 <section class="section-pad">
     <div class="container">
         <div class="card-janus">
             <h2>Confirm Account Deletion</h2>
-            <p>
-                This will deactivate your account. You will no longer be able to log in and the system
-                will behave as if the account does not exist.
-            </p>
-            <p>
-                Existing historical records, such as applications and opportunities, will remain in the database
-                for reporting and integrity.
-            </p>
+            <p>Once deleted, this account can no longer be accessed.</p>
 
             <form method="post">
                 @Html.AntiForgeryToken()

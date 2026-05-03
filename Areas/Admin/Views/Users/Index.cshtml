@@ -16,10 +16,10 @@
                         <tr>
                             <td>@user.DisplayName</td>
                             <td>@user.Email</td>
-                            <td>@user.IsStudent</td>
-                            <td>@user.IsHost</td>
-                            <td>@user.IsAdmin</td>
-                            <td>@user.IsActive</td>
+                            <td>@(user.IsStudent ? "Yes" : "No")</td>
+                            <td>@(user.IsHost ? "Yes" : "No")</td>
+                            <td>@(user.IsAdmin ? "Yes" : "No")</td>
+                            <td>@(user.IsActive ? "Yes" : "No")</td>
                             <td class="text-nowrap">
                                 <a asp-area="Admin" asp-controller="Users" asp-action="Details" asp-route-id="@user.Id" class="btn-outline-teal btn-sm">Details</a>
                                 <a asp-area="Admin" asp-controller="Users" asp-action="Edit" asp-route-id="@user.Id" class="btn-outline-teal btn-sm">Edit</a>

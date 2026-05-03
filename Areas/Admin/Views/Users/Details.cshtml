@@ -12,10 +12,10 @@
         <h2>@Model.ManagedUser.DisplayName</h2>
         <p><strong>Email:</strong> @Model.ManagedUser.Email</p>
         <p><strong>City:</strong> @Model.ManagedUser.City</p>
-        <p><strong>Student Role:</strong> @Model.ManagedUser.IsStudent</p>
-        <p><strong>Host Role:</strong> @Model.ManagedUser.IsHost</p>
-        <p><strong>Admin Role:</strong> @Model.ManagedUser.IsAdmin</p>
-        <p><strong>Active:</strong> @Model.ManagedUser.IsActive</p>
+        <p><strong>Student Role:</strong> @(Model.ManagedUser.IsStudent ? "Yes" : "No")</p>
+        <p><strong>Host Role:</strong> @(Model.ManagedUser.IsHost ? "Yes" : "No")</p>
+        <p><strong>Admin Role:</strong> @(Model.ManagedUser.IsAdmin ? "Yes" : "No")</p>
+        <p><strong>Active:</strong> @(Model.ManagedUser.IsActive ? "Yes" : "No")</p>
         <a asp-area="Admin" asp-controller="Users" asp-action="Edit" asp-route-id="@Model.ManagedUser.Id" class="btn-primary-janus">Edit</a>
         <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="btn-outline-teal">Back</a>
     </div>

@@ -17,7 +17,7 @@
         <td>@item.StudentUser?.DisplayName</td>
         <td>@item.Opportunity?.Title</td>
         <td>@item.Status</td>
-        <td>@item.IsActive</td>
+        <td>@(item.IsActive ? "Yes" : "No")</td>
         <td>@item.AppliedAt.ToShortDateString()</td>
         <td class="text-nowrap">
             <a asp-area="Admin" asp-controller="Applications" asp-action="Details" asp-route-id="@item.Id" class="btn-outline-teal btn-sm">Details</a>

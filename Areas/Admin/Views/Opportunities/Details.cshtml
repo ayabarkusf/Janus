@@ -14,8 +14,8 @@
         <p><strong>City:</strong> @Model.Opportunity.City</p>
         <p><strong>Skills:</strong> @Model.Opportunity.SkillsTaught</p>
         <p><strong>Description:</strong> @Model.Opportunity.Description</p>
-        <p><strong>Open:</strong> @Model.Opportunity.IsOpen</p>
-        <p><strong>Active:</strong> @Model.Opportunity.IsActive</p>
+        <p><strong>Open:</strong> @(Model.Opportunity.IsOpen ? "Yes" : "No")</p>
+        <p><strong>Active:</strong> @(Model.Opportunity.IsActive ? "Yes" : "No")</p>
         <a asp-area="Admin" asp-controller="Opportunities" asp-action="Edit" asp-route-id="@Model.Opportunity.Id" class="btn-primary-janus">Edit</a>
         <a asp-area="Admin" asp-controller="Opportunities" asp-action="Index" class="btn-outline-teal">Back</a>
     </div>

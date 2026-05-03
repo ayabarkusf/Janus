@@ -23,8 +23,8 @@
     <div class="mb-3"><label asp-for="Opportunity.City" class="form-label"></label><input asp-for="Opportunity.City" class="form-control" /></div>
     <div class="mb-3"><label asp-for="Opportunity.SkillsTaught" class="form-label"></label><input asp-for="Opportunity.SkillsTaught" class="form-control" /></div>
     <div class="mb-3"><label asp-for="Opportunity.Description" class="form-label"></label><textarea asp-for="Opportunity.Description" class="form-control"></textarea></div>
-    <div class="form-check"><input asp-for="Opportunity.IsOpen" class="form-check-input" /><label asp-for="Opportunity.IsOpen" class="form-check-label"></label></div>
-    <div class="form-check mb-4"><input asp-for="Opportunity.IsActive" class="form-check-input" /><label asp-for="Opportunity.IsActive" class="form-check-label"></label></div>
+    <div class="form-check"><input asp-for="Opportunity.IsOpen" class="form-check-input" /><label asp-for="Opportunity.IsOpen" class="form-check-label">Open</label></div>
+    <div class="form-check mb-4"><input asp-for="Opportunity.IsActive" class="form-check-input" /><label asp-for="Opportunity.IsActive" class="form-check-label">Active</label></div>
     <button type="submit" class="btn-primary-janus">Create</button>
     <a asp-area="Admin" asp-controller="Opportunities" asp-action="Index" class="btn-outline-teal">Cancel</a>
 </form>

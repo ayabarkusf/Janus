@@ -19,8 +19,8 @@
         <td>@item.HostUser?.DisplayName</td>
         <td>@item.Industry</td>
         <td>@item.City</td>
-        <td>@item.IsOpen</td>
-        <td>@item.IsActive</td>
+        <td>@(item.IsOpen ? "Yes" : "No")</td>
+        <td>@(item.IsActive ? "Yes" : "No")</td>
         <td class="text-nowrap">
             <a asp-area="Admin" asp-controller="Opportunities" asp-action="Details" asp-route-id="@item.Id" class="btn-outline-teal btn-sm">Details</a>
             <a asp-area="Admin" asp-controller="Opportunities" asp-action="Edit" asp-route-id="@item.Id" class="btn-outline-teal btn-sm">Edit</a>

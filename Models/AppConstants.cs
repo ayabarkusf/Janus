@@ -13,7 +13,7 @@ public static class AppConstants
 
     public static readonly string[] Industries =
     {
-        "Healthcare", "Technology", "Finance", "Law", "Education"
+        "Healthcare", "Technology", "Finance", "Law", "Education", "Other"
     };
 
     public static readonly string[] GradeLevels =

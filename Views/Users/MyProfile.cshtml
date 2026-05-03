@@ -17,13 +17,10 @@
                 <p><strong>Email:</strong> @Model.CurrentUser.Email</p>
                 <p><strong>City:</strong> @Model.CurrentUser.City</p>
 
-                <div class="row g-3 my-4">
-                    <div class="col-md-4"><div class="profile-badge">Student: @(isStudent ? "Yes" : "No")</div></div>
-                    <div class="col-md-4"><div class="profile-badge">Host: @(isHost ? "Yes" : "No")</div></div>
-                    @if (isAdmin)
-                    {
-                        <div class="col-md-4"><div class="profile-badge">Admin: Yes</div></div>
-                    }
+                <div class="d-flex flex-wrap gap-2 my-4">
+                    @if (isStudent) { <span class="profile-badge">Student</span> }
+                    @if (isHost) { <span class="profile-badge">Host</span> }
+                    @if (isAdmin) { <span class="profile-badge">Admin</span> }
                 </div>
 
                 @if (isStudent)

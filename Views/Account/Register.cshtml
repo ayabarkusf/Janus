@@ -1,73 +1,202 @@
-@model Janus.ViewModels.Account.RegisterViewModel
+@model Janus.ViewModels.Account.RegisterPageViewModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Create Account";
+    var active = Model.ActiveSection ?? "student";
 }
 
 <div class="page-header">
     <div class="container">
         <h1>Create Account</h1>
-        <p>Start with one account. You can enable student or host features from your profile.</p>
+        <p>Choose how you want to join.</p>
     </div>
 </div>
 
 <section class="section-pad">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-6">
-                <div class="card-janus">
-                    <form asp-controller="Account" asp-action="Register" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div class="container">
+<div class="row justify-content-center">
+<div class="col-lg-7">
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="FirstName" class="form-label"></label>
-                                <input asp-for="FirstName" class="form-control" />
-                                <span asp-validation-for="FirstName" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="LastName" class="form-label"></label>
-                                <input asp-for="LastName" class="form-control" />
-                                <span asp-validation-for="LastName" class="text-danger"></span>
-                            </div>
-                        </div>
+<div id="student" style="display:block;height:0;visibility:hidden;"></div>
+<div id="host" style="display:block;height:0;visibility:hidden;"></div>
 
-                        <div class="mb-3">
-                            <label asp-for="Email" class="form-label"></label>
-                            <input asp-for="Email" class="form-control" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
-                        </div>
+<ul class="nav nav-tabs-janus mb-4" id="registerTabs">
+    <li class="nav-item">
+        <button class="nav-link @(active == "student" ? "active" : "")"
+                id="student-tab" data-bs-toggle="tab" data-bs-target="#tab-student"
+                type="button">Student Registration</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link @(active == "host" ? "active" : "")"
+                id="host-tab" data-bs-toggle="tab" data-bs-target="#tab-host"
+                type="button">Join as Host</button>
+    </li>
+</ul>
 
-                        <div class="mb-3">
-                            <label asp-for="City" class="form-label"></label>
-                            <input asp-for="City" class="form-control" />
-                            <span asp-validation-for="City" class="text-danger"></span>
-                        </div>
+<div class="tab-content" id="registerTabContent">
 
-                        <div class="mb-3">
-                            <label asp-for="Password" class="form-label"></label>
-                            <input asp-for="Password" class="form-control" />
-                            <span asp-validation-for="Password" class="text-danger"></span>
-                        </div>
+    <div class="tab-pane fade @(active == "student" ? "show active" : "")" id="tab-student" role="tabpanel">
+        <div class="card-janus">
+            <form asp-controller="Account" asp-action="RegisterStudent" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                        <div class="mb-4">
-                            <label asp-for="ConfirmPassword" class="form-label"></label>
-                            <input asp-for="ConfirmPassword" class="form-control" />
-                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                        </div>
-
-                        <button type="submit" class="btn-primary-janus w-100">Create Account</button>
-                    </form>
-
-                    <p class="mt-4 mb-0">
-                        Already have an account?
-                        <a asp-controller="Account" asp-action="Login">Sign in</a>.
-                    </p>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Student.FirstName" class="form-label"></label>
+                        <input asp-for="Student.FirstName" class="form-control" />
+                        <span asp-validation-for="Student.FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Student.LastName" class="form-label"></label>
+                        <input asp-for="Student.LastName" class="form-control" />
+                        <span asp-validation-for="Student.LastName" class="text-danger"></span>
+                    </div>
                 </div>
-            </div>
+
+                <div class="mb-3">
+                    <label asp-for="Student.Email" class="form-label"></label>
+                    <input asp-for="Student.Email" class="form-control" />
+                    <span asp-validation-for="Student.Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Student.City" class="form-label"></label>
+                    <input asp-for="Student.City" class="form-control" />
+                    <span asp-validation-for="Student.City" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Student.GradeLevel" class="form-label"></label>
+                    <select asp-for="Student.GradeLevel" class="form-select">
+                        <option value="">-- Select --</option>
+                        @foreach (var g in Model.GradeLevels)
+                        {
+                            <option value="@g">@g</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Student.GradeLevel" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Student.CareerInterest" class="form-label"></label>
+                    <select asp-for="Student.CareerInterest" class="form-select">
+                        <option value="">-- Select --</option>
+                        @foreach (var c in Model.Industries)
+                        {
+                            <option value="@c">@c</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Student.CareerInterest" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Student.Password" class="form-label"></label>
+                    <input asp-for="Student.Password" class="form-control" />
+                    <span asp-validation-for="Student.Password" class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Student.ConfirmPassword" class="form-label"></label>
+                    <input asp-for="Student.ConfirmPassword" class="form-control" />
+                    <span asp-validation-for="Student.ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn-primary-janus w-100">Create Student Account</button>
+            </form>
+            <p class="mt-4 mb-0">Already have an account? <a asp-controller="Account" asp-action="Login">Sign in</a>.</p>
         </div>
     </div>
+
+    <div class="tab-pane fade @(active == "host" ? "show active" : "")" id="tab-host" role="tabpanel">
+        <div class="card-janus">
+            <form asp-controller="Account" asp-action="RegisterHost" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Host.FirstName" class="form-label"></label>
+                        <input asp-for="Host.FirstName" class="form-control" />
+                        <span asp-validation-for="Host.FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Host.LastName" class="form-label"></label>
+                        <input asp-for="Host.LastName" class="form-control" />
+                        <span asp-validation-for="Host.LastName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Host.Email" class="form-label"></label>
+                    <input asp-for="Host.Email" class="form-control" />
+                    <span asp-validation-for="Host.Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Host.City" class="form-label"></label>
+                    <input asp-for="Host.City" class="form-control" />
+                    <span asp-validation-for="Host.City" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Host.Company" class="form-label"></label>
+                    <input asp-for="Host.Company" class="form-control" />
+                    <span asp-validation-for="Host.Company" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Host.Industry" class="form-label"></label>
+                    <select asp-for="Host.Industry" class="form-select">
+                        <option value="">-- Select --</option>
+                        @foreach (var ind in Model.Industries)
+                        {
+                            <option value="@ind">@ind</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Host.Industry" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Host.Bio" class="form-label"></label>
+                    <textarea asp-for="Host.Bio" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Host.Bio" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Host.Password" class="form-label"></label>
+                    <input asp-for="Host.Password" class="form-control" />
+                    <span asp-validation-for="Host.Password" class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Host.ConfirmPassword" class="form-label"></label>
+                    <input asp-for="Host.ConfirmPassword" class="form-control" />
+                    <span asp-validation-for="Host.ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn-primary-janus w-100">Create Host Account</button>
+            </form>
+            <p class="mt-4 mb-0">Already have an account? <a asp-controller="Account" asp-action="Login">Sign in</a>.</p>
+        </div>
+    </div>
+
+</div>
+</div>
+</div>
+</div>
 </section>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const hash = window.location.hash;
+            const map = { '#student': '#tab-student', '#host': '#tab-host' };
+            const target = map[hash];
+            if (target) {
+                const btn = document.querySelector('[data-bs-target="' + target + '"]');
+                if (btn) bootstrap.Tab.getOrCreateInstance(btn).show();
+            }
+        })();
+    </script>
 }

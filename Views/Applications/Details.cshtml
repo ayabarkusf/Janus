@@ -34,7 +34,14 @@
                     </form>
                 }
 
-                <a asp-controller="Opportunities" asp-action="MyOpportunities" class="btn-outline-teal mt-4">Back</a>
+                @if (Model.CanEditStatus)
+                {
+                    <a asp-controller="Opportunities" asp-action="MyOpportunities" class="btn-outline-teal mt-4">Back</a>
+                }
+                else
+                {
+                    <a asp-controller="Applications" asp-action="MyApplications" class="btn-outline-teal mt-4">Back</a>
+                }
             </div>
         }
     </div>

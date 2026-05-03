@@ -73,48 +73,100 @@ public class AccountController : Controller
     [AllowAnonymous]
     public IActionResult Register()
     {
-        return View(new RegisterViewModel());
+        return View(new RegisterPageViewModel());
     }
 
     [HttpPost]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register(RegisterViewModel model)
+    public async Task<IActionResult> RegisterStudent(RegisterPageViewModel model)
     {
+        foreach (var key in ModelState.Keys.Where(k => !k.StartsWith("Student.")).ToList())
+            ModelState.Remove(key);
+
         if (!ModelState.IsValid)
         {
-            return View(model);
+            model.ActiveSection = "student";
+            return View("Register", model);
         }
 
-        // UserManager stores the user through ASP.NET Core Identity and hashes the password securely.
+        var s = model.Student;
         var user = new ApplicationUser
         {
-            UserName = model.Email,
-            Email = model.Email,
+            UserName = s.Email,
+            Email = s.Email,
             EmailConfirmed = true,
-            FirstName = model.FirstName,
-            LastName = model.LastName,
-            City = model.City,
+            FirstName = s.FirstName,
+            LastName = s.LastName,
+            City = s.City,
+            GradeLevel = s.GradeLevel,
+            CareerInterest = s.CareerInterest,
+            IsStudent = true,
             IsActive = true,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
 
-        var result = await _userManager.CreateAsync(user, model.Password);
+        var result = await _userManager.CreateAsync(user, s.Password);
         if (result.Succeeded)
         {
-            // SignInManager creates the authentication cookie after successful registration.
             await _signInManager.SignInAsync(user, isPersistent: false);
-            TempData["Success"] = "Account created. You can now enable a student or host profile.";
+            TempData["Success"] = "Student account created.";
             return RedirectToAction("MyProfile", "Users");
         }
 
         foreach (var error in result.Errors)
-        {
             ModelState.AddModelError(string.Empty, error.Description);
+
+        model.ActiveSection = "student";
+        return View("Register", model);
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RegisterHost(RegisterPageViewModel model)
+    {
+        foreach (var key in ModelState.Keys.Where(k => !k.StartsWith("Host.")).ToList())
+            ModelState.Remove(key);
+
+        if (!ModelState.IsValid)
+        {
+            model.ActiveSection = "host";
+            return View("Register", model);
         }
 
-        return View(model);
+        var h = model.Host;
+        var user = new ApplicationUser
+        {
+            UserName = h.Email,
+            Email = h.Email,
+            EmailConfirmed = true,
+            FirstName = h.FirstName,
+            LastName = h.LastName,
+            City = h.City,
+            Company = h.Company,
+            Industry = h.Industry,
+            Bio = h.Bio,
+            IsHost = true,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        var result = await _userManager.CreateAsync(user, h.Password);
+        if (result.Succeeded)
+        {
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            TempData["Success"] = "Host account created.";
+            return RedirectToAction("MyProfile", "Users");
+        }
+
+        foreach (var error in result.Errors)
+            ModelState.AddModelError(string.Empty, error.Description);
+
+        model.ActiveSection = "host";
+        return View("Register", model);
     }
 
     [HttpGet]

@@ -42,7 +42,19 @@ public class IndexModel
     public IndexModel() { }
     public IndexModel(ApplicationDbContext context) { }
     public IList<Opportunity> Opportunities { get; set; } = new List<Opportunity>();
-    public string[] Industries => AppConstants.Industries;
+    public string[] Industries
+    {
+        get
+        {
+            var result = new List<string>();
+            foreach (var industry in AppConstants.Industries)
+            {
+                if (industry != "Other")
+                    result.Add(industry);
+            }
+            return result.ToArray();
+        }
+    }
     public string? Industry { get; set; }
     public string? City { get; set; }
 }
