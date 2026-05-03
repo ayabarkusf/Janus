@@ -1,49 +1,217 @@
 @model Janus.ViewModels.Insights.IndexModel
 @{
-    ViewData["Title"] = "Insights";
+    ViewData["Title"] = "Market Insights";
 }
 
 <div class="page-header">
     <div class="container">
         <h1>Market Insights</h1>
-        <p>Prepared for future labor market API integration.</p>
+        <p>Search any occupation to see live salary and career outlook data.</p>
     </div>
 </div>
 
 <section class="section-pad">
     <div class="container">
-        <div class="card-janus mb-4">
-            <h2 class="form-section-title">External API Placeholder</h2>
-            <p>
-                This page is reserved for external labor market data, such as BLS API data. For now,
-                it displays seeded database records so the page remains functional during development.
+
+        <div class="card-janus mb-5">
+            <h2 class="form-section-title">Search Occupations</h2>
+            <p style="color:var(--text-muted); margin-bottom:1.5rem;">
+                Type any job title to get live wage data, career outlook, and education requirements
+                powered by the U.S. Department of Labor.
             </p>
+            <form method="get" asp-action="Index" class="d-flex gap-3 flex-wrap">
+                <input type="text"
+                       name="keyword"
+                       value="@Model.Keyword"
+                       placeholder="e.g. Nurse, Software Developer, Lawyer..."
+                       class="form-control"
+                       style="max-width:400px; background:var(--bg-primary); color:var(--text-light); border:1px solid var(--accent-purple);" />
+                <button type="submit"
+                        class="btn"
+                        style="background:var(--accent-purple); color:var(--white); border-radius:var(--btn-radius); padding:8px 24px;">
+                    Search
+                </button>
+                @if (!string.IsNullOrWhiteSpace(Model.Keyword))
+                {
+                    <a asp-action="Index"
+                           style="color:var(--text-muted); align-self:center; font-size:0.9rem;">
+                        Clear
+                    </a>
+                }
+            </form>
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-janus">
-                <thead>
-                    <tr>
-                        <th>Industry</th>
-                        <th>Metric</th>
-                        <th>Value</th>
-                        <th>Source</th>
-                        <th>Last Updated</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.Insights)
+        @if (!Model.SearchPerformed)
+        {
+            <div class="mb-4">
+                <p style="color:var(--text-muted); margin-bottom:1rem;">Try searching for:</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    @foreach (var suggestion in new[] { "Nurse", "Software Developer", "Financial Analyst", "Lawyer", "Teacher", "Data Scientist", "Accountant" })
                     {
-                        <tr>
-                            <td>@item.Industry</td>
-                            <td>@item.MetricName</td>
-                            <td>@item.MetricValue</td>
-                            <td>@item.SourceName</td>
-                            <td>@item.LastUpdatedAt.ToShortDateString()</td>
-                        </tr>
+                        <a asp-action="Index" asp-route-keyword="@suggestion"
+                               class="btn"
+                               style="background:var(--bg-secondary); color:var(--text-muted); border:1px solid var(--accent-purple); border-radius:var(--btn-radius); font-size:0.85rem;">
+                            @suggestion
+                        </a>
                     }
-                </tbody>
-            </table>
-        </div>
+                </div>
+            </div>
+        }
+
+        @if (Model.SearchPerformed)
+        {
+            @if (!string.IsNullOrWhiteSpace(Model.SearchError))
+            {
+                <div class="card-janus mb-4" style="border-left:3px solid var(--accent-danger);">
+                    <p class="mb-0" style="color:var(--accent-danger);">@Model.SearchError</p>
+                </div>
+            }
+            else if (!Model.SearchResults.Any())
+            {
+                <div class="card-janus mb-4" style="border-left:3px solid var(--accent-amber);">
+                    <p class="mb-0" style="color:var(--accent-amber);">
+                        No results found for "<strong>@Model.Keyword</strong>".
+                        Try: Nurse, Doctor, Lawyer, Teacher, Software Developer, Accountant.
+                    </p>
+                </div>
+            }
+            else
+            {
+                <div class="d-flex align-items-center gap-3 flex-wrap mb-4">
+                    <a href="https://www.careeronestop.org" target="_blank" rel="noopener noreferrer">
+                        <img src="~/images/CareerOneStop-Logo.png"
+                             alt="CareerOneStop Logo"
+                             style="height:70px; background:#fff; border-radius:6px; padding:6px 12px;" />
+                    </a>
+                    <p class="mb-0" style="color:var(--text-muted); font-size:0.85rem;">
+                        Live data from
+                        <a href="https://www.careeronestop.org" target="_blank" rel="noopener noreferrer">CareerOneStop</a>,
+                        sponsored by the U.S. Department of Labor.
+                        Wages from BLS Occupational Employment and Wage Statistics (OEWS) — 2024.
+                    </p>
+                </div>
+
+                <p style="color:var(--text-muted); margin-bottom:1.5rem;">
+                    Showing <strong style="color:var(--accent-teal);">@Model.SearchResults.Count</strong>
+                    result(s) for "<strong style="color:var(--white);">@Model.Keyword</strong>"
+                </p>
+
+                @foreach (var result in Model.SearchResults)
+                {
+                    <div class="card-janus mb-4">
+                        <div class="row g-4 align-items-start">
+
+                            <div class="col-lg-7">
+                                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                                    <span style="font-size:0.75rem; color:var(--text-muted); background:var(--bg-primary); padding:2px 8px; border-radius:10px; border:1px solid rgba(255,255,255,0.1);">
+                                        O*NET: @result.OccupationCode
+                                    </span>
+                                    @if (result.BrightOutlook)
+                                    {
+                                        <span class="badge"
+                                              style="background:var(--accent-teal); color:#0A0E27; font-size:0.75rem; padding:4px 10px; border-radius:20px;">
+                                            &#11088; Bright Outlook
+                                        </span>
+                                    }
+                                </div>
+
+                                <h3 style="font-size:1.3rem; color:var(--accent-teal); margin-bottom:0.75rem;">
+                                    @result.OccupationTitle
+                                </h3>
+
+                                @if (!string.IsNullOrWhiteSpace(result.Description))
+                                {
+                                    <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.7; margin:0;">
+                                        @result.Description
+                                    </p>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(result.EducationLevel))
+                                {
+                                    <div class="mt-3" style="font-size:0.85rem; color:var(--text-muted);">
+                                        🎓 Typical education: <strong style="color:var(--text-light);">@result.EducationLevel</strong>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="col-lg-5">
+                                <div class="row g-3">
+                                    @if (!string.IsNullOrWhiteSpace(result.MedianAnnualWage))
+                                    {
+                                        <div class="col-6">
+                                            <div style="background:var(--bg-primary); border-radius:10px; padding:1.2rem; text-align:center; border:1px solid rgba(255,255,255,0.08);">
+                                                <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:0.5rem;">
+                                                    Median Annual
+                                                </div>
+                                                <div style="font-size:1.4rem; font-weight:700; color:var(--accent-amber);">
+                                                    @result.MedianAnnualWage
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(result.MedianHourlyWage))
+                                    {
+                                        <div class="col-6">
+                                            <div style="background:var(--bg-primary); border-radius:10px; padding:1.2rem; text-align:center; border:1px solid rgba(255,255,255,0.08);">
+                                                <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:0.5rem;">
+                                                    Median Hourly
+                                                </div>
+                                                <div style="font-size:1.4rem; font-weight:700; color:var(--white);">
+                                                    @result.MedianHourlyWage
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    <div class="col-12">
+                                        <div style="background:var(--bg-primary); border-radius:10px; padding:1rem; border:1px solid rgba(255,255,255,0.08);">
+                                            <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:0.5rem;">
+                                                Data Source
+                                            </div>
+                                            <div style="font-size:0.8rem; color:var(--text-muted);">
+                                                BLS Occupational Employment & Wage Statistics · 2024
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+            }
+        }
+
+        @if (Model.Insights.Any())
+        {
+            <div class="card-janus mt-5">
+                <h2 class="form-section-title">Industry Overview</h2>
+                <div class="table-responsive">
+                    <table class="table table-janus">
+                        <thead>
+                            <tr>
+                                <th>Industry</th>
+                                <th>Metric</th>
+                                <th>Value</th>
+                                <th>Source</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Insights)
+                            {
+                                <tr>
+                                    <td>@item.Industry</td>
+                                    <td>@item.MetricName</td>
+                                    <td>@item.MetricValue</td>
+                                    <td>@item.SourceName</td>
+                                    <td>@item.LastUpdatedAt.ToShortDateString()</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
     </div>
 </section>
