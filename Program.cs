@@ -22,11 +22,21 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    // Identity redirects authentication and authorization events to MVC routes.
     options.LoginPath = "/Account/Login";
     options.LogoutPath = "/Account/Logout";
     options.AccessDeniedPath = "/Home/AccessDenied";
 });
+
+// ── CareerOneStop API integration ────────────────────────────────────────────
+builder.Services.Configure<Janus.Services.CareerOneStopSettings>(
+    builder.Configuration.GetSection("CareerOneStop"));
+
+builder.Services.AddHttpClient<Janus.Services.CareerOneStopService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(15);
+});
+
+builder.Services.AddMemoryCache();
 
 // MVC services: controllers return views and use models/view models.
 builder.Services.AddControllersWithViews();
