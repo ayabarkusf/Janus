@@ -46,6 +46,10 @@ Janus is an ASP.NET Core MVC opportunity platform that connects students with pr
 #### Application Details
 - Fixed "Back" button: students are now returned to **My Applications**; hosts are returned to **My Opportunities** (was always going to My Opportunities, causing a 403 for students)
 
+#### Footer
+- Removed My Profile, Create Student Profile, Create Host Profile, and Sign Up links from the footer
+- Replaced with About and Hosts links
+
 #### Account deletion
 - Simplified confirmation message to: *"Once deleted, this account can no longer be accessed."*
 
