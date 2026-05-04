@@ -5,3 +5,4 @@ obj/
 *.suo
 appsettings.Production.json
 appsettings.secrets.json
+appsettings.Development.json
