@@ -1,6 +1,33 @@
 @model Janus.ViewModels.AboutModel
 @{
     ViewData["Title"] = "About";
+
+    var githubRepoUrl = "https://github.com/ayabarkusf/Janus";
+    var githubReadmeUrl = githubRepoUrl + "#readme";
+
+    var team = new[]
+    {
+        new {
+            Name      = "Aya Bark",
+            Role      = "MVC Conversion & Backend Architecture",
+            PhotoPath = "/images/team/Aya.jpg"
+        },
+        new {
+            Name      = "Ashish Karamchandani",
+            Role      = "API Integration",
+            PhotoPath = "/images/team/Ashish.jpg"
+        },
+        new {
+            Name      = "Alessandro AlMeida",
+            Role      = " Project Management, Frontend Development & Testing",
+            PhotoPath = "/images/team/Alessandro.jpg"
+        },
+        new {
+            Name      = "Kirti Tomar",
+            Role      = "Azure SQL Database & Cloud Deployment",
+            PhotoPath = "/images/team/Kirti.jpg"
+        }
+    };
 }
 
 <div class="page-header">
@@ -12,21 +39,27 @@
 
 <section class="section-pad">
     <div class="container">
-        <div class="row g-4 align-items-center">
-            <div class="col-lg-5">
-                <img src="~/images/janus-statue.jpg" alt="Janus statue" class="rounded shadow" />
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-4">
+                <img src="~/images/janus-statue.jpg" alt="Janus statue" class="rounded shadow w-100 h-100" style="object-fit: cover;" />
             </div>
-            <div class="col-lg-7">
-                <div class="card-janus">
-                    <h2 class="section-title">Mission</h2>
+            <div class="col-lg-8">
+                <div class="card-janus h-100">
+                    <h2 class="section-title">Our Mission</h2>
                     <p>
-                        Janus connects high school students with working professionals for one-month shadow
-                        experiences. The goal is to help students explore real careers before choosing a college
-                        major or professional path.
+                        Janus exists to close the gap between classroom learning and the working world. 
+                        Named after the Roman god of transitions, the god with two faces who looks at both
+                        the past and the future, Janus gives high school students the chance to step inside 
+                        a profession before they commit to it.
                     </p>
                     <p>
-                        The application is built with ASP.NET Core MVC, Entity Framework Core, SQL Server LocalDB,
-                        ASP.NET Core Identity and a future-ready path for Azure SQL Database and Azure App Service.
+                        We pair students with working professionals for one-month shadow experiences. 
+                        Short enough to fit a school schedule. Long enough to reveal what a career actually
+                        looks like day to day.
+                    </p>
+                    <p class="mb-0">
+                        Our purpose is simple. Help young people choose a path with confidence, not guesswork.
+                        And give professionals a meaningful way to shape the next generation of talent in their field.
                     </p>
                 </div>
             </div>
@@ -35,14 +68,53 @@
 </section>
 
 <section class="section-pad-sm">
-    <div class="container text-center">
-        <h2 class="section-title">Data Model</h2>
-        <p class="section-subtitle">A simplified model with one user table, opportunities and applications.</p>
-        <div class="card-janus">
-            <pre class="erd-text">AspNetUsers 1 --- * Opportunities
-AspNetUsers 1 --- * OpportunityApplications
-Opportunities 1 --- * OpportunityApplications
-MarketInsights stores future API market data.</pre>
+    <div class="container">
+        <div class="text-center">
+            <h2 class="section-title">Meet the Team</h2>
+            <p class="section-subtitle">The students behind Janus.</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            @foreach (var member in team)
+            {
+                <div class="col-md-6 col-lg-3">
+                    <div class="card-janus h-100 text-center">
+                        <img src="@member.PhotoPath"
+                             alt="@member.Name"
+                             class="rounded-circle mb-3 d-block mx-auto"
+                             style="width: 140px; height: 140px; object-fit: cover; border: 3px solid var(--accent-purple);" />
+                        <h5 class="mb-2" style="color: var(--white);">@member.Name</h5>
+                        <p class="mb-0" style="color: var(--accent-teal); font-size: 0.9rem; font-weight: 600;">@member.Role</p>
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </section>
+
+<section class="section-pad-sm">
+    <div class="container text-center">
+        <h2 class="section-title">Technical Documentation</h2>
+        <p class="section-subtitle">
+            Full technical details, including API endpoints, data model, CRUD implementation and engineering challenges, are documented in the project's GitHub README.
+        </p>
+        <div class="card-janus" style="max-width: 720px; margin: 0 auto;">
+            <p class="mb-3">The README covers:</p>
+            <ul class="text-start" style="color: var(--text-muted); display: inline-block;">
+                <li>API endpoints and route structure for Public, Student, Host and Admin areas</li>
+                <li>Updated Entity-Relationship Diagram (ERD) of the data model</li>
+                <li>Overview of CRUD implementation across all core entities</li>
+                <li>Notable technical challenges and the solutions we chose</li>
+            </ul>
+            <div class="mt-3">
+                <a href="@githubReadmeUrl" target="_blank" rel="noopener" class="btn btn-primary">
+                    View README on GitHub
+                </a>
+                <a href="@githubRepoUrl" target="_blank" rel="noopener" class="btn btn-outline-light ms-2">
+                    Browse Repository
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
