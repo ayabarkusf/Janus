@@ -1,21 +1,118 @@
 # Janus MVC
 
-Janus is an ASP.NET Core MVC opportunity platform that connects students with professional shadowing experiences.
+Janus is an ASP.NET Core MVC web application that connects high school students with working professionals for one-month career shadow experiences. Built as the final project for **ISM 6225 — Advanced Application Development** at the University of South Florida.
+
+## Team
+
+| Member                 | Role                                                       |
+|------------------------|------------------------------------------------------------|
+| Aya Bark               | MVC Conversion & Backend Architecture                      |
+| Ashish Karamchandani   | API Integration                                            |
+| Alessandro AlMeida     | Project Management, Frontend Development & Testing         |
+| Kirti Tomar            | Azure SQL Database & Cloud Deployment                      |
 
 ## Main features
 
 - MVC architecture with Controllers, Views, Models and ViewModels
-- SQL Server LocalDB persistence through Entity Framework Core
+- SQL Server LocalDB persistence through Entity Framework Core (Azure SQL ready)
 - ASP.NET Core Identity for authentication, password hashing and role-based authorization
 - Identity roles for Student, Host and Admin permissions
 - Admin area for managing users, opportunities and applications
+- Live labor market data via the U.S. Department of Labor's CareerOneStop API
 - Seed data for demo users, opportunities, applications and market insights
 
 ## Demo accounts
 
-- Admin: admin@janus.com / Admin123!
-- Host: sarah.kim@tgh.org / Host123!
-- Student: maya.johnson@email.com / Student123!
+| Role    | Email                       | Password    |
+|---------|-----------------------------|-------------|
+| Admin   | admin@janus.com             | Admin123!   |
+| Host    | sarah.kim@tgh.org           | Host123!    |
+| Student | maya.johnson@email.com      | Student123! |
+
+## Tech stack
+
+- ASP.NET Core MVC (.NET 10)
+- Entity Framework Core
+- SQL Server LocalDB (development) / Azure SQL Database (production-ready)
+- ASP.NET Core Identity
+- Bootstrap 5.3 + custom CSS
+- CareerOneStop Web API for live labor market data
+
+## Architecture
+
+Janus follows a strict MVC separation:
+
+- **Models/** — EF Core entities (`ApplicationUser`, `Opportunity`, `OpportunityApplication`, `MarketInsight`)
+- **ViewModels/** — page-specific DTOs that views bind to
+- **Controllers/** — request routing and orchestration
+- **Views/** — Razor pages organized by controller
+- **Data/** — `ApplicationDbContext` plus `DbInitializer` for seeding
+- **Services/** — external integrations (CareerOneStop API client)
+- **Areas/Admin/** — separate admin area for management screens
+
+---
+
+## Data model
+
+![Janus ERD](wwwroot/images/datamodel.png)
+
+The data model has four entities:
+
+- **AspNetUsers** (single table representing Students, Hosts and Admins, distinguished by ASP.NET Identity roles)
+- **Opportunities** — shadow experiences posted by Hosts
+- **OpportunityApplications** — applications students submit to opportunities
+- **MarketInsights** — labor market data populated from the CareerOneStop API
+
+Core relationships:
+
+- `AspNetUsers` 1 — \* `Opportunities` (a host posts many opportunities)
+- `AspNetUsers` 1 — \* `OpportunityApplications` (a student submits many applications)
+- `Opportunities` 1 — \* `OpportunityApplications` (an opportunity receives many applications)
+- `MarketInsights` is a standalone reference table populated from the CareerOneStop API. It is not foreign-keyed to other tables — industry-level data isn't owned by any single user or opportunity.
+
+A single `AspNetUsers` table represents Students, Hosts and Admins, distinguished by ASP.NET Identity roles. This avoids duplicate user tables and keeps authentication unified.
+
+---
+
+## CRUD implementation
+
+Every core entity supports the full Create / Read / Update / Delete lifecycle. The table below summarizes which role performs each operation and where in the app it lives.
+
+| Entity                      | Create                                          | Read                                                     | Update                                              | Delete                                              |
+|-----------------------------|-------------------------------------------------|----------------------------------------------------------|-----------------------------------------------------|-----------------------------------------------------|
+| **Opportunity**             | Hosts via `Opportunities/Create`; Admins via `/Admin/Opportunities/Create` | Public list at `/Opportunities`; details at `/Opportunities/Details/{id}` | Hosts via `Edit`; Admins via `/Admin/Opportunities/Edit` | Hosts via `Delete` (soft-delete via `IsActive` flag); Admins via `/Admin/Opportunities/Delete` |
+| **OpportunityApplication**  | Students via `Applications/Apply`              | Students see own at `/Applications/MyApplications`; Hosts see those for their opportunities; Admins see all at `/Admin/Applications` | Hosts accept or decline via `Applications/Details`; Admins via `/Admin/Applications/Edit` | Students withdraw (soft-delete); Admins via `/Admin/Applications/Delete` |
+| **ApplicationUser**         | Self-register at `/Account/Register` (Student or Host); Admins create via `/Admin/Users` | Admins view all at `/Admin/Users`; users view self at `/Users/MyProfile`; hosts viewable at `/Hosts/Details/{id}` | Users edit own at `/Users/EditProfile`; Admins via `/Admin/Users/Edit` | Users delete own at `/Users/DeleteAccount` (soft-delete via `IsActive` flag); Admins via `/Admin/Users/Delete` |
+| **MarketInsight**           | Populated by CareerOneStop API on Insights search; seed data as fallback | Public read at `/Insights`                              | Auto-refreshed by API on search                     | Reseeded on database recreation                     |
+
+### Patterns used across all CRUD operations
+
+- **Server-side validation** through data annotations (`[Required]`, `[StringLength]`, `[RegularExpression]`) on view models
+- **Anti-forgery tokens** on every POST form to prevent CSRF
+- **`[Authorize(Roles = "...")]`** attributes restrict actions to the right roles (Student / Host / Admin)
+- **Soft delete** via `IsActive` flag for `ApplicationUser`, `Opportunity` and `OpportunityApplication`, so historical records (and accepted applications) are preserved when entities are removed
+- **Status enum** for applications (Pending / Accepted / Declined) enforced by a regex constraint on the database column
+
+---
+
+## Notable challenges and solutions
+
+**1. Single user table for three roles.**
+Rather than building separate `Student`, `Host` and `Admin` tables, we kept a single `ApplicationUser` entity and used ASP.NET Identity's role system to distinguish between roles. This keeps foreign keys (e.g., `Opportunity.HostUserId`) clean, lets a single account hold both Student and Host roles if needed, and avoids the pain of polymorphic relationships in EF Core. Role-specific fields (`GradeLevel`, `CareerInterest`, `Company`, `Industry`) are nullable on the same row and only populated for the relevant role.
+
+**2. Unified registration with role-specific data.**
+The original design had separate registration flows for students and hosts. We consolidated this into a single `/Account/Register` page with two tabs (`#student` and `#host`). Each tab posts to a dedicated action (`RegisterStudent` or `RegisterHost`) that creates the user, sets the appropriate role flag, and redirects appropriately. The homepage CTAs link directly to the right tab via URL anchor (`#student` or `#host`) so users land in the right form by default.
+
+**3. Live API integration with graceful fallback.**
+The `Insights` page calls a real external API (CareerOneStop) that can fail for any number of reasons — rate limits, network issues, invalid tokens, downtime. To prevent a third-party outage from breaking our page, the controller catches API failures, logs them, and falls back to the seeded `MarketInsights` data so users always see something useful. Successful API responses are cached in memory for six hours via `IMemoryCache` to minimize API calls and stay within rate limits.
+
+**4. Cascading deletes vs. preserving history.**
+EF Core's default cascade behavior would delete applications when a host removed an opportunity, which would lose acceptance records. We disabled cascade on that relationship and use the `IsActive` flag for soft-delete instead, so accepted applications and the audit trail stay intact even when a host removes their listing.
+
+**5. Admin area routing.**
+Putting admin pages under `Areas/Admin/` required registering an area route in `Program.cs` and using `[Area("Admin")]` on those controllers. The benefit is full URL-level separation (`/Admin/Users` vs. `/Users`) without controller name collisions, and the admin section can have its own layout, navigation and authorization policy.
+
+---
 
 ## Changelog
 
@@ -53,6 +150,12 @@ Janus is an ASP.NET Core MVC opportunity platform that connects students with pr
 #### Account deletion
 - Simplified confirmation message to: *"Once deleted, this account can no longer be accessed."*
 
+#### About page
+- Rewrote mission statement with Janus mythology framing (god of transitions, two faces looking at past and future)
+- Added "Meet the Team" section with photos and roles for all four members
+- Added link to GitHub README for technical documentation
+- Replaced data model image with updated ERD generated from current entity classes
+
 ---
 
 ## Run locally
@@ -63,11 +166,15 @@ dotnet build
 dotnet ef database update
 dotnet run
 ```
+
+The `DbInitializer` seeds demo accounts on first run.
+
+---
+
 ## CareerOneStop API Integration
 *Implemented by Ashish Karamchandani*
 
-The Market Insights page (`/Insights`) uses the CareerOneStop Web API
-sponsored by the U.S. Department of Labor to provide live labor market data.
+The Market Insights page (`/Insights`) uses the CareerOneStop Web API sponsored by the U.S. Department of Labor to provide live labor market data.
 
 ### What it does
 - Search any occupation by keyword (e.g. Nurse, Lawyer, Software Developer)
@@ -75,35 +182,38 @@ sponsored by the U.S. Department of Labor to provide live labor market data.
 - Results are cached for 6 hours to minimize API calls
 - Falls back to seeded database records if API is unavailable
 
-### Files added or modified
-- `Services/CareerOneStopModels.cs` — API response models and settings
-- `Services/CareerOneStopService.cs` — HTTP client, keyword mapping, caching
-- `Program.cs` — registered HttpClient, MemoryCache and CareerOneStopService
-- `appsettings.json` — added CareerOneStop config section (token left empty)
-- `Controllers/InsightsController.cs` — calls the service and handles fallback
-- `ViewModels/InsightsViewModels.cs` — added search result properties
-- `Views/Insights/Index.cshtml` — search box, result cards, logo attribution
-- `wwwroot/images/CareerOneStop-Logo.png` — required logo per API agreement
-
 ### API Details
-- Provider: CareerOneStop (www.careeronestop.org)
-- Endpoint: GET /v1/comparesalaries/{userId}/wage
-- Data source: Bureau of Labor Statistics Occupational Employment and Wage Statistics (OEWS)
-- Agreement expires: 5/1/2029
 
-### Important — Setup for teammates
-The API token is NOT stored in the repository for security reasons.
-After pulling this branch you must add the token locally or the
-Insights search will not work and will show the fallback data instead.
+- **Provider:** CareerOneStop (www.careeronestop.org)
+- **Base URL:** `https://api.careeronestop.org/v1/`
+- **Data source:** Bureau of Labor Statistics Occupational Employment and Wage Statistics (OEWS)
+- **Agreement expires:** 5/1/2029
+- **Authentication:** Bearer token (stored in user secrets, not committed to repo)
+
+### Endpoints used
+
+| Step | Method | Endpoint                                                                |
+|------|--------|--------------------------------------------------------------------------|
+| 1    | `GET`  | `/v1/occupation/{userId}/{keyword}/us/0/5`                               |
+| 2    | `GET`  | `/v1/comparesalaries/{userId}/wage?keyword={onetCode}&location=us`       |
+
+The two calls are chained per search: results from the occupation search drive the wage requests, and the combined data populates the result cards on `/Insights`.
+
+### Setup
+
+The API token is not stored in the repository for security reasons. To enable live API results, add the token locally via User Secrets — otherwise the Insights search will fall back to seeded database data instead of live results.
 
 Steps:
+
 1. Open Visual Studio
 2. Right-click the Janus project in Solution Explorer
-3. Click Manage User Secrets
-4. Paste the following into secrets.json:
+3. Click **Manage User Secrets**
+4. Paste the following into `secrets.json`:
 
-{
-  "CareerOneStop:Token": "<ask Aya Bark for the token>"
-}
+   ```json
+   {
+     "CareerOneStop:Token": "<ask Aya Bark for the token>"
+   }
+   ```
 
-The UserId is already in appsettings.json and does not need to be added.
+The UserId is already in `appsettings.json` and does not need to be added.
