@@ -9,6 +9,33 @@ public class CareerOneStopSettings
     public string BaseUrl { get; set; } = "https://api.careeronestop.org/v1/";
 }
 
+public class OccupationSearchResponse
+{
+    [JsonPropertyName("OccupationList")]
+    public List<OccupationItem>? OccupationList { get; set; }
+
+    [JsonPropertyName("RecordCount")]
+    public int RecordCount { get; set; }
+}
+
+public class OccupationItem
+{
+    [JsonPropertyName("OnetTitle")]
+    public string? OnetTitle { get; set; }
+
+    [JsonPropertyName("OnetCode")]
+    public string? OnetCode { get; set; }
+
+    [JsonPropertyName("OccupationDescription")]
+    public string? OccupationDescription { get; set; }
+
+    [JsonPropertyName("BrightOutlook")]
+    public bool BrightOutlook { get; set; }
+
+    [JsonPropertyName("Wages")]
+    public WageData? Wages { get; set; }
+}
+
 public class SalaryResponse
 {
     [JsonPropertyName("OccupationDetail")]
@@ -17,23 +44,8 @@ public class SalaryResponse
 
 public class OccupationDetail
 {
-    [JsonPropertyName("OccupationTitle")]
-    public string? OccupationTitle { get; set; }
-
-    [JsonPropertyName("OccupationCode")]
-    public string? OccupationCode { get; set; }
-
-    [JsonPropertyName("SocInfo")]
-    public List<SocInfo>? SocInfo { get; set; }
-
     [JsonPropertyName("Wages")]
     public WageData? Wages { get; set; }
-}
-
-public class SocInfo
-{
-    [JsonPropertyName("SocDescription")]
-    public string? SocDescription { get; set; }
 }
 
 public class WageData

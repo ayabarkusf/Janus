@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -12,44 +12,8 @@ public class CareerOneStopService
     private readonly IMemoryCache _cache;
     private readonly ILogger<CareerOneStopService> _logger;
 
-    private static readonly Dictionary<string, (string Code, string Title)> KeywordMap =
-        new(StringComparer.OrdinalIgnoreCase)
-        {
-            ["nurse"] = ("29-1141.00", "Registered Nurses"),
-            ["registered nurse"] = ("29-1141.00", "Registered Nurses"),
-            ["rn"] = ("29-1141.00", "Registered Nurses"),
-            ["doctor"] = ("29-1221.00", "Physicians and Surgeons"),
-            ["physician"] = ("29-1221.00", "Physicians and Surgeons"),
-            ["dentist"] = ("29-1021.00", "Dentists"),
-            ["pharmacist"] = ("29-1051.00", "Pharmacists"),
-            ["physical therapist"] = ("29-1123.00", "Physical Therapists"),
-            ["healthcare"] = ("29-1141.00", "Registered Nurses"),
-            ["software developer"] = ("15-1252.00", "Software Developers"),
-            ["software engineer"] = ("15-1252.00", "Software Developers"),
-            ["programmer"] = ("15-1252.00", "Software Developers"),
-            ["developer"] = ("15-1252.00", "Software Developers"),
-            ["data scientist"] = ("15-2051.00", "Data Scientists"),
-            ["data analyst"] = ("15-2051.00", "Data Scientists"),
-            ["cybersecurity"] = ("15-1212.00", "Information Security Analysts"),
-            ["security analyst"] = ("15-1212.00", "Information Security Analysts"),
-            ["technology"] = ("15-1252.00", "Software Developers"),
-            ["financial analyst"] = ("13-2051.00", "Financial Analysts"),
-            ["accountant"] = ("13-2011.00", "Accountants and Auditors"),
-            ["auditor"] = ("13-2011.00", "Accountants and Auditors"),
-            ["finance"] = ("13-2051.00", "Financial Analysts"),
-            ["financial advisor"] = ("13-2052.00", "Personal Financial Advisors"),
-            ["economist"] = ("19-3011.00", "Economists"),
-            ["lawyer"] = ("23-1011.00", "Lawyers"),
-            ["attorney"] = ("23-1011.00", "Lawyers"),
-            ["law"] = ("23-1011.00", "Lawyers"),
-            ["paralegal"] = ("23-2011.00", "Paralegals and Legal Assistants"),
-            ["judge"] = ("23-1023.00", "Judges and Hearing Officers"),
-            ["teacher"] = ("25-2021.00", "Elementary School Teachers"),
-            ["professor"] = ("25-1099.00", "Postsecondary Teachers"),
-            ["education"] = ("25-2021.00", "Elementary School Teachers"),
-            ["school counselor"] = ("21-1012.00", "Educational Counselors"),
-            ["principal"] = ("11-9032.00", "Education Administrators"),
-        };
+    private static readonly JsonSerializerOptions JsonOpts =
+        new() { PropertyNameCaseInsensitive = true };
 
     public CareerOneStopService(
         HttpClient http,
@@ -71,75 +35,92 @@ public class CareerOneStopService
         if (_cache.TryGetValue(cacheKey, out List<IndustryInsight>? cached) && cached is not null)
             return cached;
 
-        var lookup = FindBestMatch(trimmed);
-        var apiQuery = lookup.HasValue ? lookup.Value.Code : trimmed;
-        var displayTitle = lookup.HasValue ? lookup.Value.Title : trimmed;
-
-        var results = await FetchSalaryAsync(apiQuery, displayTitle);
-
+        var results = await FetchOccupationsAsync(trimmed);
         _cache.Set(cacheKey, results, TimeSpan.FromHours(6));
         return results;
     }
 
-    private (string Code, string Title)? FindBestMatch(string input)
+    private async Task<List<IndustryInsight>> FetchOccupationsAsync(string keyword)
     {
-        if (KeywordMap.TryGetValue(input, out var exact))
-            return exact;
+        // Step 1: occupation search — returns titles, codes, descriptions
+        var encodedKeyword = Uri.EscapeDataString(keyword);
+        var searchUrl = $"https://api.careeronestop.org/v1/occupation/{_settings.UserId}/{encodedKeyword}/us/0/5";
 
-        foreach (var kvp in KeywordMap)
+        using var searchRequest = new HttpRequestMessage(HttpMethod.Get, searchUrl);
+        searchRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _settings.Token);
+
+        using var searchResponse = await _http.SendAsync(searchRequest);
+        var searchJson = await searchResponse.Content.ReadAsStringAsync();
+
+        _logger.LogInformation("CareerOneStop occupation search [{Status}] keyword='{Keyword}'",
+            searchResponse.StatusCode, keyword);
+
+        if (!searchResponse.IsSuccessStatusCode)
+            return new List<IndustryInsight>();
+
+        var envelope = JsonSerializer.Deserialize<OccupationSearchResponse>(searchJson, JsonOpts);
+
+        if (envelope?.OccupationList is null || envelope.OccupationList.Count == 0)
+            return new List<IndustryInsight>();
+
+        // Step 2: fetch wages for each occupation in parallel
+        var wageTasks = envelope.OccupationList
+            .Select(occ => FetchWagesAsync(occ.OnetCode ?? string.Empty))
+            .ToList();
+
+        var wageResults = await Task.WhenAll(wageTasks);
+
+        // Step 3: combine
+        var results = new List<IndustryInsight>();
+        for (int i = 0; i < envelope.OccupationList.Count; i++)
         {
-            if (input.Contains(kvp.Key, StringComparison.OrdinalIgnoreCase) ||
-                kvp.Key.Contains(input, StringComparison.OrdinalIgnoreCase))
-                return kvp.Value;
+            var occ = envelope.OccupationList[i];
+            var wages = wageResults[i];
+
+            var annual = wages?.FirstOrDefault(w =>
+                string.Equals(w.RateType, "Annual", StringComparison.OrdinalIgnoreCase));
+            var hourly = wages?.FirstOrDefault(w =>
+                string.Equals(w.RateType, "Hourly", StringComparison.OrdinalIgnoreCase));
+
+            results.Add(new IndustryInsight
+            {
+                OccupationTitle  = occ.OnetTitle  ?? string.Empty,
+                OccupationCode   = occ.OnetCode   ?? string.Empty,
+                Description      = TruncateDescription(occ.OccupationDescription, 2000),
+                MedianAnnualWage = FormatWage(annual?.Median, "$", "/yr"),
+                MedianHourlyWage = FormatWage(hourly?.Median, "$", "/hr"),
+                BrightOutlook    = occ.BrightOutlook,
+            });
         }
 
-        return null;
+        return results;
     }
 
-    private async Task<List<IndustryInsight>> FetchSalaryAsync(string query, string displayTitle)
+    private async Task<List<WageEntry>?> FetchWagesAsync(string onetCode)
     {
-        var encodedQuery = Uri.EscapeDataString(query);
+        if (string.IsNullOrWhiteSpace(onetCode)) return null;
+
+        var encoded = Uri.EscapeDataString(onetCode);
         var url = $"https://api.careeronestop.org/v1/comparesalaries/{_settings.UserId}/wage"
-                + $"?keyword={encodedQuery}&location=us&enableMetaData=0";
+                + $"?keyword={encoded}&location=us&enableMetaData=0";
 
-        using var request = new HttpRequestMessage(HttpMethod.Get, url);
-        request.Headers.Authorization =
-            new AuthenticationHeaderValue("Bearer", _settings.Token);
-
-        using var response = await _http.SendAsync(request);
-        var json = await response.Content.ReadAsStringAsync();
-
-        _logger.LogInformation("CareerOneStop [{Status}] query='{Query}'",
-            response.StatusCode, query);
-
-        if (!response.IsSuccessStatusCode)
-            return new List<IndustryInsight>();
-
-        var envelope = JsonSerializer.Deserialize<SalaryResponse>(json,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-        var detail = envelope?.OccupationDetail;
-        if (detail is null)
-            return new List<IndustryInsight>();
-
-        var annualWage = detail.Wages?.NationalWagesList?.FirstOrDefault(w =>
-            string.Equals(w.RateType, "Annual", StringComparison.OrdinalIgnoreCase));
-        var hourlyWage = detail.Wages?.NationalWagesList?.FirstOrDefault(w =>
-            string.Equals(w.RateType, "Hourly", StringComparison.OrdinalIgnoreCase));
-
-        var description = detail.SocInfo?.FirstOrDefault()?.SocDescription;
-
-        return new List<IndustryInsight>
+        try
         {
-            new IndustryInsight
-            {
-                OccupationTitle  = detail.OccupationTitle ?? displayTitle,
-                OccupationCode   = detail.OccupationCode  ?? string.Empty,
-                Description      = TruncateDescription(description, 2000),
-                MedianAnnualWage = FormatWage(annualWage?.Median, "$", "/yr"),
-                MedianHourlyWage = FormatWage(hourlyWage?.Median, "$", "/hr"),
-            }
-        };
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _settings.Token);
+
+            using var response = await _http.SendAsync(request);
+            if (!response.IsSuccessStatusCode) return null;
+
+            var json = await response.Content.ReadAsStringAsync();
+            var envelope = JsonSerializer.Deserialize<SalaryResponse>(json, JsonOpts);
+            return envelope?.OccupationDetail?.Wages?.NationalWagesList;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Wage fetch failed for code='{Code}'", onetCode);
+            return null;
+        }
     }
 
     private static string? FormatWage(string? raw, string prefix, string suffix)

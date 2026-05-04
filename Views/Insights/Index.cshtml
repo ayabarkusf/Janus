@@ -181,37 +181,5 @@
             }
         }
 
-        @if (Model.Insights.Any())
-        {
-            <div class="card-janus mt-5">
-                <h2 class="form-section-title">Industry Overview</h2>
-                <div class="table-responsive">
-                    <table class="table table-janus">
-                        <thead>
-                            <tr>
-                                <th>Industry</th>
-                                <th>Metric</th>
-                                <th>Value</th>
-                                <th>Source</th>
-                                <th>Last Updated</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model.Insights)
-                            {
-                                <tr>
-                                    <td>@item.Industry</td>
-                                    <td>@item.MetricName</td>
-                                    <td>@item.MetricValue</td>
-                                    <td>@item.SourceName</td>
-                                    <td>@item.LastUpdatedAt.ToShortDateString()</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        }
-
     </div>
 </section>

@@ -43,10 +43,6 @@ public class InsightsController : Controller
             }
         }
 
-        model.Insights = await _context.MarketInsights
-            .OrderBy(i => i.Industry)
-            .ToListAsync();
-
         return View(model);
     }
 }
