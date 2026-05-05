@@ -1,6 +1,7 @@
 @model Janus.ViewModels.Users.CreateHostProfileModel
 @{
     ViewData["Title"] = "Create Host Profile";
+    var showForm = (bool)(ViewData["ShowForm"] ?? false);
 }
 
 <div class="page-header"><div class="container"><h1>Create Host Profile</h1><p>Enable host features for your account.</p></div></div>
@@ -8,22 +9,22 @@
 <section class="section-pad">
     <div class="container">
         <div class="card-janus">
-            @if (Model.AlreadyHost)
+            @if (!showForm)
             {
-                <p>Your host profile is already active.</p>
-                <a asp-controller="Users" asp-action="MyProfile" class="btn-primary-janus">Back to Profile</a>
+                <h2 class="form-section-title mb-2">Create a Host Account?</h2>
+                <p class="mb-4" style="color: var(--text-muted);">Enabling a host profile allows you to create and manage opportunities for students.</p>
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a asp-controller="Users" asp-action="CreateHostProfile" asp-route-confirmed="true" class="btn-primary-janus">Sim</a>
+                    <a asp-controller="Users" asp-action="MyProfile" class="btn-outline-teal">Não</a>
+                </div>
             }
             else
             {
                 <form method="post">
                     @Html.AntiForgeryToken()
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="Input.City" />
 
-                    <div class="mb-3">
-                        <label asp-for="Input.City" class="form-label"></label>
-                        <input asp-for="Input.City" class="form-control" />
-                        <span asp-validation-for="Input.City" class="text-danger"></span>
-                    </div>
                     <div class="mb-3">
                         <label asp-for="Input.Company" class="form-label"></label>
                         <input asp-for="Input.Company" class="form-control" />
@@ -46,8 +47,10 @@
                         <span asp-validation-for="Input.Bio" class="text-danger"></span>
                     </div>
 
-                    <button type="submit" class="btn-primary-janus">Enable Host Profile</button>
-                    <a asp-controller="Users" asp-action="MyProfile" class="btn-outline-teal">Cancel</a>
+                    <div class="d-flex flex-wrap gap-2 mt-2">
+                        <button type="submit" class="btn-primary-janus">Enable Host Profile</button>
+                        <a asp-controller="Users" asp-action="MyProfile" class="btn-outline-teal">Cancel</a>
+                    </div>
                 </form>
             }
         </div>

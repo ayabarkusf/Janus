@@ -19,6 +19,55 @@ Janus is an ASP.NET Core MVC opportunity platform that connects students with pr
 
 ## Changelog
 
+### v1.2.0 — 2026-05-04
+
+#### Authentication & Role Assignment
+- `RegisterStudent` and `RegisterHost` now call `AddToRoleAsync` before `SignInAsync`, so the Identity role is included in the cookie from the very first login — previously registered users had no role claim, which broke all role-guarded pages
+- All role checks across controllers and views now use `user.IsStudent` / `user.IsHost` as a fallback alongside `IsInRoleAsync`, making the app resilient to stale cookies
+
+#### My Profile
+- Added **Phone** field to the profile display (shown only when filled)
+- Removed "Create Student Profile" and "Create Host Profile" buttons; replaced with **My Applications** (students) and **My Opportunities** (hosts)
+- Already-student users navigating to `CreateStudentProfile` are now redirected to My Profile instead of seeing the form
+
+#### Create Host Profile — Two-Step Flow
+- Navigating to `/Users/CreateHostProfile` now shows a confirmation screen ("Create a Host Account? Yes / No") before displaying the form
+- The form asks only for Company, Industry, and Bio (City is carried over silently from the existing profile)
+- Already-host users are redirected to My Profile with a message
+
+#### Opportunities Controller — Host Fixes
+- Removed `[Authorize(Roles = HostRole)]` attributes from Create, Edit, and Delete actions; replaced with manual checks that accept both the role claim and the `IsHost` flag
+- Fixed silent form failure on Create: `HostUserId` is `[Required]` on the model but not in the form for non-admin hosts — added `ModelState.Remove("Opportunity.HostUserId")` after setting it programmatically
+- `LoadHostsAsync` now unions results from the role query and the `IsHost` flag so all host accounts appear in the admin dropdown
+- Updated Create page subtitle from "Available only for hosts and admins." to "Post a new career shadow opportunity for students."
+
+#### Apply Button — Role-Based Visibility
+- Apply button on Opportunities Index and Details pages is now shown only when the user has the **Student** role (supports users who are both student and host)
+- Access Denied page updated: replaced single "Go Home" button with three options — Back to Opportunities, My Applications, Go Home
+- `Apply` POST action no longer uses `[Authorize(Roles = StudentRole)]`; manual check redirects to CreateStudentProfile instead of triggering Access Denied
+
+#### Home Page — Context-Aware CTAs
+- "Create Account" hero button hidden when the user is already logged in
+- Student card shows "My Applications" for students, nothing for host-only users
+- Host card shows "My Opportunities" for hosts, "Create Host Profile" (confirmation flow) for logged-in non-hosts, and Register link for guests
+
+#### Mobile Responsiveness
+- Opportunities table: hides Host, Industry, City, Skills columns on mobile; shows Title, Company, and action buttons only
+- My Applications table: hides Host, Industry, Status, Applied columns on mobile; shows Opportunity, Company, Details button only
+- Buttons no longer stretch to full width on mobile (removed global `width: 100%` from `@media (max-width: 576px)`); Home hero buttons unaffected
+- Edit Profile save/cancel buttons wrapped in flex container for consistent mobile layout
+- Added `.btn-sm-janus` CSS class for compact buttons inside tables
+
+#### Navigation & Layout
+- Removed **Hosts** link from nav menu and footer
+- Removed **About** link from footer
+- Removed demo account credentials from the Sign In page
+
+#### Charts
+- Second chart renamed from "Applications by Status" to **"Applications by Industry"**; query now joins `OpportunityApplications` with `Opportunities` to group by industry
+
+---
+
 ### v1.1.0 — 2026-05-03
 
 #### Authentication & Registration

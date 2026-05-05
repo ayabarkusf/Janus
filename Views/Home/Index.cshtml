@@ -15,7 +15,10 @@
                 </p>
                 <div class="hero-btns">
                     <a asp-controller="Opportunities" asp-action="Index" class="btn-primary-janus">Browse Opportunities</a>
-                    <a asp-area="" asp-controller="Account" asp-action="Register" class="btn-outline-teal">Create Account</a>
+                    @if (User.Identity?.IsAuthenticated != true)
+                    {
+                        <a asp-area="" asp-controller="Account" asp-action="Register" class="btn-outline-teal">Create Account</a>
+                    }
                 </div>
             </div>
         </div>
@@ -98,7 +101,17 @@
                         <li>Track your application status</li>
                         <li>Always free for students</li>
                     </ul>
-                    <a asp-controller="Account" asp-action="Register" asp-fragment="student" class="btn-primary-janus mt-4">Create Student Profile</a>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        @if (User.IsInRole(AppConstants.StudentRole))
+                        {
+                            <a asp-controller="Applications" asp-action="MyApplications" class="btn-primary-janus mt-4">My Applications</a>
+                        }
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Register" asp-fragment="student" class="btn-primary-janus mt-4">Create Student Profile</a>
+                    }
                 </div>
             </div>
             <div class="col-lg-6">
@@ -111,7 +124,21 @@
                         <li>Accept or decline applications</li>
                         <li>Manage your listings from one dashboard</li>
                     </ul>
-                    <a asp-controller="Account" asp-action="Register" asp-fragment="host" class="btn-secondary-janus mt-4">Create Host Profile</a>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        @if (User.IsInRole(AppConstants.HostRole))
+                        {
+                            <a asp-controller="Opportunities" asp-action="MyOpportunities" class="btn-secondary-janus mt-4">My Opportunities</a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Users" asp-action="CreateHostProfile" class="btn-secondary-janus mt-4">Create Host Profile</a>
+                        }
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Register" asp-fragment="host" class="btn-secondary-janus mt-4">Create Host Profile</a>
+                    }
                 </div>
             </div>
         </div>

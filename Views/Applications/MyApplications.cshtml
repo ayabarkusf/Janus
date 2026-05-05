@@ -12,10 +12,11 @@
                 <thead>
                     <tr>
                         <th>Opportunity</th>
-                        <th>Host</th>
-                        <th>Industry</th>
-                        <th>Status</th>
-                        <th>Applied</th>
+                        <th>Company</th>
+                        <th class="d-none d-md-table-cell">Host</th>
+                        <th class="d-none d-md-table-cell">Industry</th>
+                        <th class="d-none d-md-table-cell">Status</th>
+                        <th class="d-none d-md-table-cell">Applied</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -24,11 +25,12 @@
                     {
                         <tr>
                             <td>@item.Opportunity?.Title</td>
-                            <td>@item.Opportunity?.HostUser?.DisplayName</td>
-                            <td>@item.Opportunity?.Industry</td>
-                            <td>@item.Status</td>
-                            <td>@item.AppliedAt.ToShortDateString()</td>
-                            <td><a asp-controller="Applications" asp-action="Details" asp-route-id="@item.Id" class="btn-outline-teal btn-sm">Details</a></td>
+                            <td>@item.Opportunity?.HostUser?.Company</td>
+                            <td class="d-none d-md-table-cell">@item.Opportunity?.HostUser?.DisplayName</td>
+                            <td class="d-none d-md-table-cell">@item.Opportunity?.Industry</td>
+                            <td class="d-none d-md-table-cell">@item.Status</td>
+                            <td class="d-none d-md-table-cell">@item.AppliedAt.ToShortDateString()</td>
+                            <td><a asp-controller="Applications" asp-action="Details" asp-route-id="@item.Id" class="btn-outline-teal btn-sm-janus">Details</a></td>
                         </tr>
                     }
                 </tbody>

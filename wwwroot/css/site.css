@@ -211,6 +211,13 @@ p {
         text-decoration: none;
     }
 
+/* Small button variant for tables */
+.btn-sm-janus {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.82rem;
+    border-radius: var(--btn-radius);
+}
+
 /* ---------- Cards ---------- */
 .card-janus {
     background-color: var(--bg-secondary);
@@ -512,8 +519,8 @@ footer {
     }
 
     .btn-primary-janus,
-    .btn-secondary-janus {
-        width: 100%;
+    .btn-secondary-janus,
+    .btn-outline-teal {
         margin-bottom: 0.5rem;
     }
 

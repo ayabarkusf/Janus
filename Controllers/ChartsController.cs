@@ -24,11 +24,14 @@ public class ChartsController : Controller
             .OrderBy(x => x.Label)
             .ToListAsync();
 
-        var status = await _context.OpportunityApplications.Where(a => a.IsActive)
-            .GroupBy(a => a.Status)
-            .Select(g => new { Label = g.Key, Count = g.Count() })
-            .OrderBy(x => x.Label)
-            .ToListAsync();
+        var status = await (
+            from a in _context.OpportunityApplications
+            where a.IsActive
+            join o in _context.Opportunities on a.OpportunityId equals o.Id
+            group a by o.Industry into g
+            orderby g.Key
+            select new { Label = g.Key, Count = g.Count() }
+        ).ToListAsync();
 
         var months = await _context.OpportunityApplications.Where(a => a.IsActive)
             .GroupBy(a => new { a.AppliedAt.Year, a.AppliedAt.Month })

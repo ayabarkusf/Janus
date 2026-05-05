@@ -1,8 +1,8 @@
 @model Janus.ViewModels.Users.MyProfileModel
 @{
     ViewData["Title"] = "My Profile";
-    var isStudent = User.IsInRole(AppConstants.StudentRole);
-    var isHost = User.IsInRole(AppConstants.HostRole);
+    var isStudent = User.IsInRole(AppConstants.StudentRole) || (Model.CurrentUser?.IsStudent == true);
+    var isHost = User.IsInRole(AppConstants.HostRole) || (Model.CurrentUser?.IsHost == true);
     var isAdmin = User.IsInRole(AppConstants.AdminRole);
 }
 
@@ -15,6 +15,10 @@
             <div class="card-janus">
                 <h2>@Model.CurrentUser.DisplayName</h2>
                 <p><strong>Email:</strong> @Model.CurrentUser.Email</p>
+                @if (!string.IsNullOrEmpty(Model.CurrentUser.PhoneNumber))
+                {
+                    <p><strong>Phone:</strong> @Model.CurrentUser.PhoneNumber</p>
+                }
                 <p><strong>City:</strong> @Model.CurrentUser.City</p>
 
                 <div class="d-flex flex-wrap gap-2 my-4">
@@ -38,14 +42,6 @@
 
                 <div class="d-flex flex-wrap gap-2 mt-4">
                     <a asp-controller="Users" asp-action="EditProfile" class="btn-primary-janus">Edit Profile</a>
-                    @if (!isStudent)
-                    {
-                        <a asp-controller="Users" asp-action="CreateStudentProfile" class="btn-outline-teal">Create Student Profile</a>
-                    }
-                    @if (!isHost)
-                    {
-                        <a asp-controller="Users" asp-action="CreateHostProfile" class="btn-secondary-janus">Create Host Profile</a>
-                    }
                     @if (isStudent)
                     {
                         <a asp-controller="Applications" asp-action="MyApplications" class="btn-outline-teal">My Applications</a>

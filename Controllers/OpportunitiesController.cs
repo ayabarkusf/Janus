@@ -67,7 +67,7 @@ public class OpportunitiesController : Controller
         }
 
         var isAdmin = await _userManager.IsInRoleAsync(user, AppConstants.AdminRole);
-        var isHost = await _userManager.IsInRoleAsync(user, AppConstants.HostRole);
+        var isHost = user.IsHost || await _userManager.IsInRoleAsync(user, AppConstants.HostRole);
         if (!isAdmin && !isHost)
         {
             TempData["Error"] = "Create a host profile to manage opportunities.";
@@ -99,7 +99,7 @@ public class OpportunitiesController : Controller
         }
 
         var isAdmin = await _userManager.IsInRoleAsync(user, AppConstants.AdminRole);
-        var isHost = await _userManager.IsInRoleAsync(user, AppConstants.HostRole);
+        var isHost = user.IsHost || await _userManager.IsInRoleAsync(user, AppConstants.HostRole);
         if (!isAdmin && !isHost)
         {
             TempData["Error"] = "Create a host profile before creating opportunities.";
@@ -121,24 +121,30 @@ public class OpportunitiesController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = AppConstants.HostRole + "," + AppConstants.AdminRole)]
+    [Authorize]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind(Prefix = "Opportunity")] Opportunity opportunity)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null || !user.IsActive)
-        {
-            return Forbid();
-        }
+            return RedirectToAction("Login", "Account");
 
         var isAdmin = await _userManager.IsInRoleAsync(user, AppConstants.AdminRole);
+        var isHost = user.IsHost || await _userManager.IsInRoleAsync(user, AppConstants.HostRole);
+        if (!isAdmin && !isHost)
+        {
+            TempData["Error"] = "Create a host profile before creating opportunities.";
+            return RedirectToAction("CreateHostProfile", "Users");
+        }
+
         if (!isAdmin)
         {
             opportunity.HostUserId = user.Id;
+            ModelState.Remove("Opportunity.HostUserId");
         }
 
         var selectedHost = await _userManager.FindByIdAsync(opportunity.HostUserId);
-        if (selectedHost == null || !selectedHost.IsActive || !await _userManager.IsInRoleAsync(selectedHost, AppConstants.HostRole))
+        if (selectedHost == null || !selectedHost.IsActive || (!selectedHost.IsHost && !await _userManager.IsInRoleAsync(selectedHost, AppConstants.HostRole)))
         {
             ModelState.AddModelError(string.Empty, "Select a valid host.");
         }
@@ -164,7 +170,7 @@ public class OpportunitiesController : Controller
         return RedirectToAction(nameof(MyOpportunities));
     }
 
-    [Authorize(Roles = AppConstants.HostRole + "," + AppConstants.AdminRole)]
+    [Authorize]
     public async Task<IActionResult> Edit(int id)
     {
         var user = await _userManager.GetUserAsync(User);
@@ -188,7 +194,7 @@ public class OpportunitiesController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = AppConstants.HostRole + "," + AppConstants.AdminRole)]
+    [Authorize]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit([Bind(Prefix = "Opportunity")] Opportunity opportunity)
     {
@@ -224,7 +230,7 @@ public class OpportunitiesController : Controller
         return RedirectToAction(nameof(MyOpportunities));
     }
 
-    [Authorize(Roles = AppConstants.HostRole + "," + AppConstants.AdminRole)]
+    [Authorize]
     public async Task<IActionResult> Delete(int id)
     {
         var user = await _userManager.GetUserAsync(User);
@@ -245,7 +251,7 @@ public class OpportunitiesController : Controller
     }
 
     [HttpPost, ActionName("Delete")]
-    [Authorize(Roles = AppConstants.HostRole + "," + AppConstants.AdminRole)]
+    [Authorize]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
@@ -274,8 +280,9 @@ public class OpportunitiesController : Controller
 
     private async Task<SelectList> LoadHostsAsync()
     {
-        var hosts = await _userManager.GetUsersInRoleAsync(AppConstants.HostRole);
-        var activeHosts = hosts
+        var byRole = await _userManager.GetUsersInRoleAsync(AppConstants.HostRole);
+        var byFlag = await _context.Users.Where(u => u.IsHost && u.IsActive).ToListAsync();
+        var activeHosts = byRole.Union(byFlag)
             .Where(u => u.IsActive)
             .OrderBy(u => u.LastName)
             .ToList();

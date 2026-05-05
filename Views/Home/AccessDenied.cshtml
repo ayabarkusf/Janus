@@ -3,4 +3,10 @@
     ViewData["Title"] = "Access Denied";
 }
 <div class="page-header"><div class="container"><h1>Access Denied</h1><p>You do not have permission to access this page.</p></div></div>
-<section class="section-pad"><div class="container"><a asp-controller="Home" asp-action="Index" class="btn-primary-janus">Go Home</a></div></section>
+<section class="section-pad"><div class="container">
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-controller="Opportunities" asp-action="Index" class="btn-primary-janus">Back to Opportunities</a>
+        <a asp-controller="Applications" asp-action="MyApplications" class="btn-outline-teal">My Applications</a>
+        <a asp-controller="Home" asp-action="Index" class="btn-outline-teal">Go Home</a>
+    </div>
+</div></section>

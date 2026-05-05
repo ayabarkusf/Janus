@@ -35,13 +35,17 @@ public class UsersController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null || !user.IsActive)
-        {
             return NotFound();
+
+        if (user.IsStudent || await _userManager.IsInRoleAsync(user, AppConstants.StudentRole))
+        {
+            TempData["Success"] = "Your student profile is already active.";
+            return RedirectToAction(nameof(MyProfile));
         }
 
         var model = new Janus.ViewModels.Users.CreateStudentProfileModel(_userManager)
         {
-            AlreadyStudent = await _userManager.IsInRoleAsync(user, AppConstants.StudentRole),
+            AlreadyStudent = false,
             Input = new Janus.ViewModels.Users.CreateStudentProfileModel.InputModel
             {
                 City = user.City ?? string.Empty,
@@ -89,17 +93,23 @@ public class UsersController : Controller
         return RedirectToAction(nameof(MyProfile));
     }
 
-    public async Task<IActionResult> CreateHostProfile()
+    public async Task<IActionResult> CreateHostProfile(bool confirmed = false)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null || !user.IsActive)
-        {
             return NotFound();
+
+        if (user.IsHost || await _userManager.IsInRoleAsync(user, AppConstants.HostRole))
+        {
+            TempData["Success"] = "Your host profile is already active.";
+            return RedirectToAction(nameof(MyProfile));
         }
+
+        ViewData["ShowForm"] = confirmed;
 
         var model = new Janus.ViewModels.Users.CreateHostProfileModel(_userManager)
         {
-            AlreadyHost = await _userManager.IsInRoleAsync(user, AppConstants.HostRole),
+            AlreadyHost = false,
             Input = new Janus.ViewModels.Users.CreateHostProfileModel.InputModel
             {
                 City = user.City ?? string.Empty,
@@ -124,9 +134,10 @@ public class UsersController : Controller
 
         if (!ModelState.IsValid)
         {
+            ViewData["ShowForm"] = true;
             return View(new Janus.ViewModels.Users.CreateHostProfileModel(_userManager)
             {
-                AlreadyHost = await _userManager.IsInRoleAsync(user, AppConstants.HostRole),
+                AlreadyHost = false,
                 Input = input
             });
         }

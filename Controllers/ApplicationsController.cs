@@ -57,14 +57,17 @@ public class ApplicationsController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = AppConstants.StudentRole)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Apply([Bind(Prefix = "Input")] Janus.ViewModels.Applications.ApplyModel.InputModel input)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null || !user.IsActive)
+            return RedirectToAction("Login", "Account");
+
+        if (!user.IsStudent && !await _userManager.IsInRoleAsync(user, AppConstants.StudentRole))
         {
-            return Forbid();
+            TempData["Error"] = "You need a student profile to apply for opportunities.";
+            return RedirectToAction("CreateStudentProfile", "Users");
         }
 
         var opportunity = await _context.Opportunities
@@ -189,7 +192,7 @@ public class ApplicationsController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
 
-        if (user == null || !user.IsActive || !await _userManager.IsInRoleAsync(user, AppConstants.StudentRole))
+        if (user == null || !user.IsActive || (!user.IsStudent && !await _userManager.IsInRoleAsync(user, AppConstants.StudentRole)))
         {
             TempData["Error"] = "Create a student profile to view applications.";
             return RedirectToAction("CreateStudentProfile", "Users");

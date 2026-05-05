@@ -110,6 +110,7 @@ public class AccountController : Controller
         var result = await _userManager.CreateAsync(user, s.Password);
         if (result.Succeeded)
         {
+            await _userManager.AddToRoleAsync(user, AppConstants.StudentRole);
             await _signInManager.SignInAsync(user, isPersistent: false);
             TempData["Success"] = "Student account created.";
             return RedirectToAction("MyProfile", "Users");
@@ -157,6 +158,7 @@ public class AccountController : Controller
         var result = await _userManager.CreateAsync(user, h.Password);
         if (result.Succeeded)
         {
+            await _userManager.AddToRoleAsync(user, AppConstants.HostRole);
             await _signInManager.SignInAsync(user, isPersistent: false);
             TempData["Success"] = "Host account created.";
             return RedirectToAction("MyProfile", "Users");

@@ -40,11 +40,11 @@
                 <thead>
                     <tr>
                         <th>Title</th>
-                        <th>Host</th>
                         <th>Company</th>
-                        <th>Industry</th>
-                        <th>City</th>
-                        <th>Skills</th>
+                        <th class="d-none d-md-table-cell">Host</th>
+                        <th class="d-none d-md-table-cell">Industry</th>
+                        <th class="d-none d-md-table-cell">City</th>
+                        <th class="d-none d-md-table-cell">Skills</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -53,14 +53,19 @@
                     {
                         <tr>
                             <td>@item.Title</td>
-                            <td>@item.HostUser?.DisplayName</td>
                             <td>@item.HostUser?.Company</td>
-                            <td>@item.Industry</td>
-                            <td>@item.City</td>
-                            <td>@item.SkillsTaught</td>
-                            <td class="text-nowrap">
-                                <a asp-controller="Opportunities" asp-action="Details" asp-route-id="@item.Id" class="btn-outline-teal btn-sm">Details</a>
-                                <a asp-controller="Applications" asp-action="Apply" asp-route-opportunityId="@item.Id" class="btn-primary-janus btn-sm">Apply</a>
+                            <td class="d-none d-md-table-cell">@item.HostUser?.DisplayName</td>
+                            <td class="d-none d-md-table-cell">@item.Industry</td>
+                            <td class="d-none d-md-table-cell">@item.City</td>
+                            <td class="d-none d-md-table-cell">@item.SkillsTaught</td>
+                            <td>
+                                <div class="d-flex flex-column flex-md-row gap-1">
+                                    <a asp-controller="Opportunities" asp-action="Details" asp-route-id="@item.Id" class="btn-outline-teal btn-sm-janus">Details</a>
+                                    @if (User.IsInRole(AppConstants.StudentRole))
+                                    {
+                                        <a asp-controller="Applications" asp-action="Apply" asp-route-opportunityId="@item.Id" class="btn-primary-janus btn-sm-janus">Apply</a>
+                                    }
+                                </div>
                             </td>
                         </tr>
                     }
